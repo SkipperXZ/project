@@ -1,22 +1,38 @@
 package com.project.droneapi.model;
 
-public class User {
-    private String userName;
-    private String password;
-    private String companyName;
-    private String firstName;
-    private String lastname;
-    private String email;
-    private String teleNumber;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 
-    public User(String userName ,String password,String firstName,String lastName,String companyName,String email,String teleNumber){
+public class User {
+    @Id
+    @GeneratedValue
+    private String userID;
+    @NotNull
+    private String userName;
+    @NotNull
+    private String password;
+    @NotNull
+    private String companyName;
+    @NotNull
+    private String firstName;
+    @NotNull
+    private String lastname;
+    @Email
+    private String email;
+    @NotNull
+    private String phoneNumber;
+
+    public User(String userID,String userName ,String password,String firstName,String lastName,String companyName,String email,String phoneNumber){
+        this.userID = userID;
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
         this.lastname = lastName;
         this.companyName =companyName;
         this.email = email;
-        this.teleNumber = teleNumber;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getUserName() {
@@ -68,10 +84,10 @@ public class User {
     }
 
     public String getTeleNumber() {
-        return teleNumber;
+        return phoneNumber;
     }
 
-    public void setTeleNumber(String teleNumber) {
-        this.teleNumber = teleNumber;
+    public void setTeleNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
