@@ -109,8 +109,9 @@ def waitForArduino():
         if msg != "EOF" and startReceive and msg !="START":
             img = img + msg
             print (msg)
+         
         elif msg == "EOF" and startReceive:
-            print(bytearray(img,'utf-8'))
+            #print(bytearray(img,'utf-8'))
             decodeImage(img)
             startReceive = False
             break
@@ -205,7 +206,7 @@ print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM10"
+serPort = "COM9"
 baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
