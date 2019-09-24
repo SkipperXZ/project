@@ -65,7 +65,7 @@ def sendToArduino(sendStr):
 def recvFromArduino():
   global startMarker, endMarker
   
-  ck = ""
+  ck = b""
   x = "z" # any value that is not an end- or startMarker
   byteCount = -1 # to allow for the fact that the last increment will be one too many
   
@@ -76,7 +76,7 @@ def recvFromArduino():
   # save data until the end marker is found
   while ord(x) != endMarker:
     if ord(x) != startMarker:
-      ck = ck + x.decode("utf-8") # change for Python 3
+      ck = ck + x # change for Python 3
       byteCount += 1
     x = ser.read()
   
@@ -92,8 +92,8 @@ def waitForArduino():
    
     global startMarker, endMarker
     
-    msg = ""
-    while msg.find("Arduino is ready") == -1:
+    msg = b""
+    while msg.find(bytearray("Arduino is ready",'utf-8')) == -1:
 
       while ser.inWaiting() == 0:
         pass
@@ -116,7 +116,7 @@ def runTest(td):
 
     if waitingForReply == False:
       sendToArduino(teststr)
-      print ("Sent from PC -- Msg" + teststr.decode("utf-8"))
+      print (teststr)
       waitingForReply = True
 
     if waitingForReply == True:
@@ -125,7 +125,7 @@ def runTest(td):
         pass
         
       dataRecvd = recvFromArduino()
-      print ("Reply Received  " + dataRecvd)
+      print (dataRecvd)
       n += 1
       waitingForReply = False
 
@@ -139,7 +139,7 @@ def encodeImage():
   
   global tempList
 
-  image = open('logo.jpg', 'rb')
+  image = open('shot.jpg', 'rb')
   image_read = image.read()
   image_64_encode = base64.encodebytes(image_read)
 
@@ -186,7 +186,7 @@ def sendMassage():
       massage = b'<' + tempList[i] + tempList[i+1] + tempList[i+2] + b'>'
       testData = []
       testData.append(massage)
-      testData.append(endMassage)
+      #testData.append(endMassage)
       runTest(testData)
       break
     else:
