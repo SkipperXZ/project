@@ -65,7 +65,7 @@ def sendToArduino(sendStr):
 def recvFromArduino():
   global startMarker, endMarker
   
-  ck = ""
+  ck = b""
   x = "z" # any value that is not an end- or startMarker
   byteCount = -1 # to allow for the fact that the last increment will be one too many
   
@@ -76,7 +76,7 @@ def recvFromArduino():
   # save data until the end marker is found
   while ord(x) != endMarker:
     if ord(x) != startMarker:
-      ck = ck + x.decode("utf-8") # change for Python 3
+      ck = ck + x # change for Python 3
       byteCount += 1
     x = ser.read()
   
@@ -92,9 +92,9 @@ def waitForArduino():
    
     global startMarker, endMarker, img
     startReceive = False
-    img = ""
-    msg = ""
-    while msg.find("Arduino is ready") == -1:
+    img = b""
+    msg = b""
+    while msg.find(bytearray("Arduino is ready",'utf-8')) == -1:
 
         while ser.inWaiting() == 0:
             pass
@@ -103,18 +103,19 @@ def waitForArduino():
 
         if not startReceive:
             print("waiting for start message")
-        if msg == "START":
+        if msg == bytearray("START",'utf-8'):
             startReceive = True
 
-        if msg != "EOF" and startReceive and msg !="START":
+        if msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
             img = img + msg
             print (msg)
-         
-        elif msg == "EOF" and startReceive:
+
+        elif msg == bytearray("EOF",'utf-8') and startReceive:      
             #print(bytearray(img,'utf-8'))
             decodeImage(img)
             startReceive = False
-            break
+            print("FINISH !!!!")
+            img = b""
       
 #======================================
 
@@ -147,7 +148,7 @@ def runTest():
 
 def decodeImage(img):
     
-    image_64_decode = base64.decodebytes(bytearray(img,'utf-8'))
+    image_64_decode = base64.decodebytes(img)
 
     image_result = open('logo1.jpg', 'wb')
     image_result.write(image_64_decode)
@@ -216,7 +217,8 @@ startMarker = 60
 endMarker = 62
 
 print("Ready!!")
-waitForArduino()
+while(1):
+  waitForArduino()
 #runTest()
 
 #encodeImage()
