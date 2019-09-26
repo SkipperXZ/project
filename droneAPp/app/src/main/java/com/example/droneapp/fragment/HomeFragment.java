@@ -1,5 +1,6 @@
-package com.example.droneapp;
+package com.example.droneapp.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,19 +10,24 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.droneapp.R;
+import com.example.droneapp.User;
+import com.example.droneapp.activity.GalleryActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements OnMapReadyCallback {
+public class HomeFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private MapView mapView;
     private GoogleMap gmap;
@@ -69,6 +75,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         gmap.setMinZoomPreference(2);
         LatLng ny = new LatLng(13.7143528, -100.0059731);
         gmap.moveCamera(CameraUpdateFactory.newLatLng(ny));
+        gmap.setOnMarkerClickListener(this);
         gmap.addMarker(new MarkerOptions().position(
                 new LatLng(13.76488, 100.538334)).title("TITLE"));
         setUpClusterManager(gmap);
@@ -102,6 +109,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 new User("AhsenSaeed23", new LatLng(-43.999792, 170.463352), "https://www.ahsensaeed.com")
         );
 
-
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Intent imageAcitivity = new Intent(getActivity(), GalleryActivity.class);
+        startActivity(imageAcitivity);
+        return true;
+    }
+
 }
