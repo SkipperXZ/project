@@ -20,8 +20,12 @@ const int irqPin = 7;         // change for your board; must be a hardware inter
 
 boolean waitForData = true;
 
+byte MsgId = 0;
+byte incomingMsgId = 0;
+
 const byte numChars = 240;
 char receivedChars[numChars];   // an array to store the received data
+char previousReceivedChars[numChars] = "";
 boolean newData = false;
 
 void setup() {
@@ -51,11 +55,11 @@ void loop() {
   if (!waitForData) {
     sendACK();
     waitForData = true;
-    Serial.println("Send");
+    //Serial.println("Send");
   }
   else{
     onReceive(LoRa.parsePacket());
-    Serial.print("wait");
+    //Serial.print("wait");
   }
 }
 
@@ -66,7 +70,9 @@ void sendACK() {
   
     // send packet
     LoRa.beginPacket();
-    LoRa.print("<ACK>");
+    LoRa.print("<ACK_");
+    LoRa.print(incomingMsgId);
+    LoRa.print(">");
     LoRa.endPacket();
    
 }
@@ -82,6 +88,8 @@ void onReceive(int packetSize) {
   char rc;
   
   if (packetSize == 0) return;          // if there's no packet, return
+
+  incomingMsgId = LoRa.read();
 
   while (LoRa.available() > 0 && newData == false) {
         rc = (char)LoRa.read();
@@ -99,8 +107,23 @@ void onReceive(int packetSize) {
             newData = true;
         }
     }
-
-    showNewData();
+    
+    String str(receivedChars);
+    if(incomingMsgId == MsgId)
+    {
+      MsgId++;
+      if(str == "EOF")
+      {
+        MsgId = 0;
+      }
+      showNewData();
+    }
+    else
+    {
+      newData = false;
+      waitForData = false;
+      delay(1);
+    }
 }
 
 void showNewData() {

@@ -27,6 +27,8 @@ boolean readInProgress = false;
 boolean newDataFromPC = false;
 boolean waitForReply = false;
 
+byte msgCount = 0;
+
 long interval = 5000;
 long previousMillis = 0;
 
@@ -98,7 +100,7 @@ void onReceive(int packetSize) {
   while (LoRa.available()>0) {
     incoming += (char)LoRa.read();
   }
-
+  
   Serial.print(incoming);
 
   waitForReply = false;
@@ -157,19 +159,18 @@ void sendToRecive() {
 
   if (newDataFromPC) {
     newDataFromPC = false;
-
+    
     // send packet
     LoRa.beginPacket();
+    LoRa.write(msgCount);
     LoRa.print(message);
     LoRa.endPacket();
-    waitForReply = true;
-    //delay(10);
-
-    /*Serial.print("<Send!! ");
-    Serial.print(" Time ");
-    Serial.print(curMillis >> 9); // divide by 512 is approx = half-seconds
-    Serial.println(">");*/
-
+    msgCount++;
+    if (message == "EOF>")
+    {
+      msgCount = 0;
+    }
+    waitForReply = true; 
   }
 }
 
@@ -179,7 +180,7 @@ void reSend() {
 
     // send packet
     LoRa.beginPacket();
+    LoRa.write(msgCount);
     LoRa.print(message);
     LoRa.endPacket();
-  
 }

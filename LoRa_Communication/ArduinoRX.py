@@ -102,7 +102,8 @@ def waitForArduino():
         msg = recvFromArduino()
 
         if not startReceive:
-            print("waiting for start message")
+            #print("waiting for start message")
+            print (msg)
         if msg == bytearray("START",'utf-8'):
             startReceive = True
 
@@ -207,7 +208,7 @@ print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM9"
+serPort = "COM10"
 baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))

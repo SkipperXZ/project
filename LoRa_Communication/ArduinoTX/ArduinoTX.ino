@@ -52,6 +52,7 @@ void getDataFromPC() {
   if(Serial.available() > 0) {
 
     char x = Serial.read();
+
       // the order of these IF clauses is significant
       
     if (x == endMarker) {
@@ -99,7 +100,7 @@ void sendToRecive() {
     LoRa.beginPacket();
     LoRa.print(message);
     LoRa.endPacket();
-
+    
     delay(10);
 
     Serial.print("<Send!! ");

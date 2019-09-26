@@ -139,7 +139,7 @@ def encodeImage():
   
   global tempList
 
-  image = open('shot.jpg', 'rb')
+  image = open('10kb.jpg', 'rb')
   image_read = image.read()
   image_64_encode = base64.encodebytes(image_read)
 
