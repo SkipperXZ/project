@@ -1,34 +1,31 @@
-package com.project.droneapi.model;
+package com.example.droneapp.model;
 
 
+import com.google.gson.annotations.SerializedName;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Entity
-public class AerialPhotograph {
-    @Id
+public class APDetail {
     private String uuid;
-    @NotNull
     private String userID;
-    @NotNull
     private double latitude;
-    @NotNull
     private double longitude;
-    @NotNull
-    private LocalDateTime timeStamp;
-    @NotNull
-    private String base64Image;
+    private String timeStamp;
 
+    public APDetail(String uuid, String userID, double latitude, double longitude, String timeStamp) {
+        this.uuid = uuid;
+        this.userID = userID;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.timeStamp = timeStamp;
+    }
 
-    public String getImageID() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setImageID(String imageID) {
-        this.uuid = imageID;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getUserID() {
@@ -55,19 +52,14 @@ public class AerialPhotograph {
         this.longitude = longitude;
     }
 
-    public LocalDateTime getTimeStamp() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(LocalDateTime timeStamp) {
+    public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
 
-    public String getBase64Image() {
-        return base64Image;
-    }
-
-    public void setBase64Image(String image) {
-        this.base64Image = image;
-    }
+    @SerializedName("body")
+    private String text;
 }

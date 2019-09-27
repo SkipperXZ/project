@@ -2,30 +2,26 @@ package com.project.droneapi.service;
 
 import com.project.droneapi.model.APDetail;
 import com.project.droneapi.model.AerialPhotograph;
-import com.project.droneapi.model.Base64Image;
+import com.project.droneapi.repository.APDetailRepository;
 import com.project.droneapi.repository.AerialPhotographRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
-public class AerialPhotographService {
-
-    private AerialPhotographRepository repository;
+public class APDetailService {
+    private APDetailRepository repository;
 
     @Autowired
-    public AerialPhotographService(AerialPhotographRepository repository) {
+    public APDetailService(APDetailRepository repository) {
         this.repository = repository;
     }
 
-    public List<AerialPhotograph> retrieveCustomers() {
+    public List<APDetail> retrieveCustomers() {
         return repository.findAll();
     }
 
-    public AerialPhotograph createNewAP(AerialPhotograph ap) {
-        return repository.save(ap);
+    public APDetail createAPDetail(APDetail apDetail) {
+        return repository.save(apDetail);
     }
-
-
 }

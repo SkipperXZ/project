@@ -1,14 +1,11 @@
 package com.project.droneapi.model;
 
-
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-
 @Entity
-public class AerialPhotograph {
+public class APDetail {
     @Id
     private String uuid;
     @NotNull
@@ -19,16 +16,13 @@ public class AerialPhotograph {
     private double longitude;
     @NotNull
     private LocalDateTime timeStamp;
-    @NotNull
-    private String base64Image;
 
-
-    public String getImageID() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setImageID(String imageID) {
-        this.uuid = imageID;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getUserID() {
@@ -61,13 +55,5 @@ public class AerialPhotograph {
 
     public void setTimeStamp(LocalDateTime timeStamp) {
         this.timeStamp = timeStamp;
-    }
-
-    public String getBase64Image() {
-        return base64Image;
-    }
-
-    public void setBase64Image(String image) {
-        this.base64Image = image;
     }
 }

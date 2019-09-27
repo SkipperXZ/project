@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.Manifest;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -25,9 +26,20 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
+import com.example.droneapp.JSonPlaceHoldeApi;
 import com.example.droneapp.R;
+import com.example.droneapp.model.APDetail;
+import com.example.droneapp.model.Base64Image;
 import com.example.droneapp.ui.dashboard.DashboardViewModel;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class DashboardFragment extends Fragment implements LocationListener {
 
@@ -38,6 +50,8 @@ public class DashboardFragment extends Fragment implements LocationListener {
     private double lat;
     private double lon;
     private final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 99;
+    private JSonPlaceHoldeApi jsonPlaceHoldeApi;
+    private boolean isFailed = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_dashboard, container, false);
@@ -57,10 +71,20 @@ public class DashboardFragment extends Fragment implements LocationListener {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String str = lat + "  " + lon;
-                latLonText.setText(str);
+                /*String str = lat + "  " + lon;
+                latLonText.setText(str);*/
+                String uuid = UUID.randomUUID().toString().replace("-", "");
+                APDetail apDetail = new APDetail(uuid,"joe",lat,lon,"2014-01-01T00:00:00");
+                uploadPhoto(apDetail);
             }
         });
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://171.98.159.3:8080/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        jsonPlaceHoldeApi = retrofit.create((JSonPlaceHoldeApi.class));
         /*
         if ( ContextCompat.checkSelfPermission( getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
 
@@ -115,4 +139,29 @@ public class DashboardFragment extends Fragment implements LocationListener {
     public void onProviderDisabled(String provider) {
 
     }
+
+    private void uploadPhoto(APDetail ap){
+        Call<APDetail> call = jsonPlaceHoldeApi.createAPDetail(ap);
+        call.enqueue(new Callback<APDetail>() {
+            @Override
+            public void onResponse(Call<APDetail> call, Response<APDetail> response) {
+                if(!response.isSuccessful()){
+                    isFailed = true;
+                    latLonText.setText(response.toString());
+                    return;
+                }
+                Toast toast = Toast.makeText ( getActivity(), "Success", Toast.LENGTH_LONG );
+                toast.show ( );
+            }
+
+            @Override
+            public void onFailure(Call<APDetail> call, Throwable t) {
+                latLonText.setText(t.toString());
+            }
+        });
+
+
+
+    }
+
 }
