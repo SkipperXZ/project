@@ -20,7 +20,7 @@ public class AerialPhotograph {
     @NotNull
     private LocalDateTime timeStamp;
     @NotNull
-    private String image;
+    private String Base64Image;
 
    /* public AerialPhotograph(String imageID, String userID, double latitude, double longitude, LocalDateTime timeStamp){
        this.imageID = imageID;
@@ -70,11 +70,11 @@ public class AerialPhotograph {
         this.timeStamp = timeStamp;
     }
 
-    public String getImage() {
-        return image;
+    public String getBase64Image() {
+        return Base64Image;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setBase64Image(String image) {
+        this.Base64Image = image;
     }
 }

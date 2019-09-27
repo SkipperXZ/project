@@ -34,6 +34,7 @@ public class DashboardFragment extends Fragment implements LocationListener {
     private Button takePhotoButton;
     private ImageView imagePreview;
     private TextView latLonText;
+    private Button uploadButton;
     private double lat;
     private double lon;
     private final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 99;
@@ -44,7 +45,7 @@ public class DashboardFragment extends Fragment implements LocationListener {
         takePhotoButton = (Button) v.findViewById(R.id.takePhotoButton);
         imagePreview = (ImageView) v.findViewById(R.id.perviewImage);
         latLonText = (TextView) v.findViewById(R.id.latlongText);
-
+        uploadButton = (Button)v.findViewById(R.id.uploadButton);
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,15 +53,32 @@ public class DashboardFragment extends Fragment implements LocationListener {
                 startActivityForResult(intent, 0);
             }
         });
+
+        uploadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String str = lat + "  " + lon;
+                latLonText.setText(str);
+            }
+        });
+        /*
         if ( ContextCompat.checkSelfPermission( getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
 
             ActivityCompat.requestPermissions( getActivity(), new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
                     MY_PERMISSION_ACCESS_COARSE_LOCATION );
         }else{
             LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+            Location location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+            onLocationChanged(location);
+        }*/
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,0,5,this);
+            Location location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
             onLocationChanged(location);
         }
+
+
 
 
 
@@ -72,7 +90,7 @@ public class DashboardFragment extends Fragment implements LocationListener {
         super.onActivityResult(requestCode, resultCode, data);
         Bitmap bitmap = (Bitmap)data.getExtras().get("data");
         imagePreview.setImageBitmap(bitmap);
-        String str = String.valueOf(lat) + "        " + String.valueOf(lon);
+        String str = String.valueOf(lat) + "  " + String.valueOf(lon);
         latLonText.setText(str);
 
     }
