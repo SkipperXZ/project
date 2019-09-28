@@ -5,6 +5,7 @@ import com.project.droneapi.repository.ImageDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,6 +25,16 @@ public class ImageDetailService {
     public ImageDetail createNewAP(ImageDetail imageDetail) {
         return repository.save(imageDetail);
 
+    }
+    public List<String> getAllImageUrlFromMarker(String userID,String markerID){
+        List<ImageDetail> imageDetails = repository.findAllByUserIDAndMarkerID(userID,markerID);
+        List<String>imageUrls = new ArrayList<>();
+
+        for (ImageDetail e:
+             imageDetails) {
+            imageUrls.add(e.getImageID());
+        }
+        return imageUrls;
     }
 
 
