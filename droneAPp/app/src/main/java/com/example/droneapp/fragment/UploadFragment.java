@@ -40,11 +40,12 @@ public class UploadFragment extends Fragment implements LocationListener {
 
     private Button takePhotoButton;
     private ImageView imagePreview;
-    private TextView latText, longText;
+    private TextView latText, lonText;
     private Button uploadButton;
     private byte[] imageByte;
     private double lat;
     private double lon;
+    private Location location;
     private final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 99;
     private JSonPlaceHoldeApi jsonPlaceHoldeApi;
     private boolean isFailed = false;
@@ -55,7 +56,7 @@ public class UploadFragment extends Fragment implements LocationListener {
         takePhotoButton = (Button) v.findViewById(R.id.takePhotoButton);
         imagePreview = (ImageView) v.findViewById(R.id.perviewImage);
         latText = (TextView) v.findViewById(R.id.tv_lat);
-        longText = (TextView) v.findViewById(R.id.tv_long);
+        lonText = (TextView) v.findViewById(R.id.tv_long);
         uploadButton = (Button)v.findViewById(R.id.uploadButton);
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +69,7 @@ public class UploadFragment extends Fragment implements LocationListener {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(imageByte != null) {
+                if(imageByte != null && location != null) {
                     ImageUploadForm imageUploadForm = new ImageUploadForm("joe",lat,lon,"today",imageByte);
                     uploadPhoto(imageUploadForm);
                 }
@@ -81,20 +82,11 @@ public class UploadFragment extends Fragment implements LocationListener {
                 .build();
 
         jsonPlaceHoldeApi = retrofit.create((JSonPlaceHoldeApi.class));
-        /*
-        if ( ContextCompat.checkSelfPermission( getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
 
-            ActivityCompat.requestPermissions( getActivity(), new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
-                    MY_PERMISSION_ACCESS_COARSE_LOCATION );
-        }else{
-            LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
-            onLocationChanged(location);
-        }*/
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,0,5,this);
-            Location location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+            location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
             onLocationChanged(location);
         }
 
@@ -114,6 +106,14 @@ public class UploadFragment extends Fragment implements LocationListener {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         imageByte = stream.toByteArray();
+
+        if(location != null){
+            latText.setText("Your Latitude : "+lat);
+            lonText.setText("Your Longitude : "+lon);
+        }else{
+            latText.setText("please turn on GPS");
+            lonText.setText("please turn on GPS");
+        }
 
 
     }
@@ -147,15 +147,18 @@ public class UploadFragment extends Fragment implements LocationListener {
                 if(!response.isSuccessful()){
                     isFailed = true;
                     //latLonText.setText(response.code());
+                    Toast toast = Toast.makeText ( getActivity(), "Failed to upload", Toast.LENGTH_LONG );
+                    toast.show ( );
                     return;
                 }
-                Toast toast = Toast.makeText ( getActivity(), "Success", Toast.LENGTH_LONG );
+                Toast toast = Toast.makeText ( getActivity(), "Upload successful", Toast.LENGTH_LONG );
                 toast.show ( );
             }
 
             @Override
             public void onFailure(Call<ImageUploadForm> call, Throwable t) {
-               // latLonText.setText(t.toString());
+                Toast toast = Toast.makeText ( getActivity(), "Failed to connect api", Toast.LENGTH_LONG );
+                toast.show ( );
             }
         });
 
