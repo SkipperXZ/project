@@ -40,7 +40,7 @@ public class UploadFragment extends Fragment implements LocationListener {
 
     private Button takePhotoButton;
     private ImageView imagePreview;
-    private TextView latLonText;
+    private TextView latText, longText;
     private Button uploadButton;
     private byte[] imageByte;
     private double lat;
@@ -54,7 +54,8 @@ public class UploadFragment extends Fragment implements LocationListener {
 
         takePhotoButton = (Button) v.findViewById(R.id.takePhotoButton);
         imagePreview = (ImageView) v.findViewById(R.id.perviewImage);
-        latLonText = (TextView) v.findViewById(R.id.latlongText);
+        latText = (TextView) v.findViewById(R.id.tv_lat);
+        longText = (TextView) v.findViewById(R.id.tv_long);
         uploadButton = (Button)v.findViewById(R.id.uploadButton);
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
