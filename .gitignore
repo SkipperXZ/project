@@ -93,3 +93,7 @@ droneAPp/app/gradle/wrapper/gradle-wrapper.properties
 droneAPp/app/gradlew
 droneAPp/app/gradlew.bat
 droneAPp/app/local.properties
+droneAPp/app/.idea/assetWizardSettings.xml
+droneAPp/app/.idea/libraries/Gradle__com_google_android_gms_play_services_location_17_0_0_aar.xml
+droneAPp/app/.idea/libraries/Gradle__com_google_android_gms_play_services_places_placereport_17_0_0_aar.xml
+droneAPp/app/.idea/navEditor.xml

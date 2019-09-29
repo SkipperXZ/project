@@ -9,7 +9,7 @@
         android:id="@+id/navigation_home"
         android:name="com.example.droneapp.fragment.MapFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home"
+        tools:layout="@layout/fragment_map"
         class="com.google.android.gms.maps.SupportMapFragment"
         />
 
@@ -17,7 +17,7 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.example.droneapp.fragment.UploadFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_camera" />
 
     <fragment
         android:id="@+id/navigation_notifications"

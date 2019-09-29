@@ -1,7 +1,9 @@
 package com.example.droneapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -34,9 +36,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+        requestPermission();
 
     }
 
+    private void requestPermission(){
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                1);
+    }
     private boolean verify(String user,String pass){
         if(user.equalsIgnoreCase("jopark123") && pass.equals(pass)){
             return true;

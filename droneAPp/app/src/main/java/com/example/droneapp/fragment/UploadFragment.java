@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +32,15 @@ import com.example.droneapp.API;
 import com.example.droneapp.JSonPlaceHoldeApi;
 import com.example.droneapp.R;
 import com.example.droneapp.model.ImageUploadForm;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.ByteArrayOutputStream;
-import java.util.UUID;
 
-public class UploadFragment extends Fragment implements LocationListener {
+public class UploadFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private Button takePhotoButton;
     private ImageView imagePreview;
@@ -45,13 +49,11 @@ public class UploadFragment extends Fragment implements LocationListener {
     private byte[] imageByte;
     private double lat;
     private double lon;
-    private Location location;
     private final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 99;
     private JSonPlaceHoldeApi jsonPlaceHoldeApi;
-    private boolean isFailed = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
         takePhotoButton = (Button) v.findViewById(R.id.takePhotoButton);
         imagePreview = (ImageView) v.findViewById(R.id.perviewImage);
@@ -69,7 +71,7 @@ public class UploadFragment extends Fragment implements LocationListener {
         uploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(imageByte != null && location != null) {
+                if(imageByte != null && lat !=0  && lon != 0) {
                     ImageUploadForm imageUploadForm = new ImageUploadForm("joe",lat,lon,"today",imageByte);
                     uploadPhoto(imageUploadForm);
                 }
@@ -84,11 +86,7 @@ public class UploadFragment extends Fragment implements LocationListener {
         jsonPlaceHoldeApi = retrofit.create((JSonPlaceHoldeApi.class));
 
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(locationManager.GPS_PROVIDER,0,5,this);
-            location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
-            onLocationChanged(location);
-        }
+
 
 
 
@@ -107,37 +105,34 @@ public class UploadFragment extends Fragment implements LocationListener {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         imageByte = stream.toByteArray();
 
-        if(location != null){
-            latText.setText("Your Latitude : "+lat);
-            lonText.setText("Your Longitude : "+lon);
-        }else{
-            latText.setText("please turn on GPS");
-            lonText.setText("please turn on GPS");
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                Log.d("GPS",location.getLatitude() +" " +location.getLatitude());
+                                lat = location.getLatitude();
+                                lon = location.getLongitude();
+                                if(location != null){
+                                    latText.setText("Your Latitude : "+lat);
+                                    lonText.setText("Your Longitude : "+lon);
+                                }
+                            }else{
+                                latText.setText("please turn on GPS");
+                                lonText.setText("please turn on GPS");
+                            }
+                        }
+                    });
         }
 
 
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        lat = location.getLatitude();
-        lon = location.getLongitude();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
 
     }
 
-    @Override
-    public void onProviderEnabled(String provider) {
 
-    }
 
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     private void uploadPhoto(ImageUploadForm ap){
         Call<ImageUploadForm> call = jsonPlaceHoldeApi.createImageUploadForm(ap.getUserID(),ap.getLatitude(),ap.getLongitude(),ap.getTimeStamp(),ap.getImageFile());
@@ -145,7 +140,6 @@ public class UploadFragment extends Fragment implements LocationListener {
             @Override
             public void onResponse(Call<ImageUploadForm> call, Response<ImageUploadForm> response) {
                 if(!response.isSuccessful()){
-                    isFailed = true;
                     //latLonText.setText(response.code());
                     Toast toast = Toast.makeText ( getActivity(), "Failed to upload", Toast.LENGTH_LONG );
                     toast.show ( );
@@ -166,4 +160,18 @@ public class UploadFragment extends Fragment implements LocationListener {
 
     }
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

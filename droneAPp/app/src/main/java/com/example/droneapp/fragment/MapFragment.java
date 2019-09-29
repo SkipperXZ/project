@@ -1,13 +1,9 @@
 package com.example.droneapp.fragment;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -31,33 +26,46 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import com.example.droneapp.API;
 import com.example.droneapp.JSonPlaceHoldeApi;
 import com.example.droneapp.R;
-import com.example.droneapp.User;
 import com.example.droneapp.activity.GalleryActivity;
 import com.example.droneapp.model.Marker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.clustering.ClusterManager;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
-
+public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private GoogleApiClient googleApiClient;
     private MapView mapView;
     private GoogleMap gmap;
+    private double currentLat;
+    private double currentLon;
     private JSonPlaceHoldeApi jsonPlaceHoldeApi;
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
     private Location location;
+    private FusedLocationProviderClient fusedLocationClient;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_home, container, false);
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
+
+        /*GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();*/
+
+
+
+
         return v;
     }
 
@@ -79,6 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
 
         }
+
     }
 
     private void setMarker(String userID, final ClusterManager clusterManager)  {
@@ -160,15 +169,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             googleMap.setMyLocationEnabled(true);
         }
     }
-    private void setCameraToCurrnetLocation(GoogleMap gmap){
-        LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+    private void setCameraToCurrnetLocation(final GoogleMap gmap){
+        /*LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         Criteria mCriteria = new Criteria();
-        String bestProvider = String.valueOf(manager.getBestProvider(mCriteria, true));
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
+        String bestProvider = String.valueOf(manager.getBestProvider(mCriteria, true));*/
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            Log.d("GPS",location.getLatitude() +" " +location.getLatitude());
+                            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()),15));
+                        }
+                    }
+                });
+
+        /*if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Location mLocation = manager.getLastKnownLocation(bestProvider);
-            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLocation.getLatitude(), mLocation.getLongitude()), 15));
-        }
+            Log.d("GPS",mLocation.getLongitude() +" " +mLocation.getLatitude());
+
+            Location location = LocationServices.getFusedLocationProviderClient(this);
+        }*/
+
+
+
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
