@@ -113,7 +113,7 @@ def waitForArduino():
 
         elif msg == bytearray("EOF",'utf-8') and startReceive:      
             #print(bytearray(img,'utf-8'))
-            decodeImage(img)
+            decodeImage(img.decode("utf-8"))
             startReceive = False
             print("FINISH !!!!")
             img = b""
@@ -146,14 +146,15 @@ def runTest():
 
         #time.sleep(5)
 #======================================
-
+countImg = 0
 def decodeImage(img):
-    
-    image_64_decode = base64.decodebytes(img)
+    global countImg
+    image_64_decode = base64.b64decode(img + '=' * (-len(img) % 4))
 
-    image_result = open('logo1.jpg', 'wb')
+    image_result = open('logo'+ str(countImg) +'.jpg', 'wb')
     image_result.write(image_64_decode)
 
+    countImg += 1
 #======================================
 
 def encodeImage():
@@ -212,7 +213,6 @@ serPort = "COM10"
 baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
-
 
 startMarker = 60
 endMarker = 62

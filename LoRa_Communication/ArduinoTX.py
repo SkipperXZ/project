@@ -180,20 +180,10 @@ def sendMassage():
     start = 1
 
   for i in range(start,len(tempList)-1,3):
-
-    if i == len(tempList)-4:
-      #massage = '<' + tempList[i].decode("utf-8") + r'\n' + tempList[i+1].decode("utf-8") + r'\n' + tempList[i+2].decode("utf-8") + r'\n' + '>'
-      massage = b'<' + tempList[i] + tempList[i+1] + tempList[i+2] + b'>'
-      testData = []
-      testData.append(massage)
-      #testData.append(endMassage)
-      runTest(testData)
-      break
-    else:
-      massage = b'<' + tempList[i] + tempList[i+1] + tempList[i+2] + b'>'
-      testData = []
-      testData.append(massage)
-      runTest(testData)
+    massage = b'<' + tempList[i] + tempList[i+1] + tempList[i+2] + b'>'
+    testData = []
+    testData.append(massage)  
+    runTest(testData)
   
   testData = []
   testData.append(endMassage)
@@ -226,7 +216,6 @@ waitForArduino()
 encodeImage()
 while(1):
   sendMassage()
-#print(tempList[len(tempList)-1])
 
 ser.close
 
