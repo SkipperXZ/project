@@ -50,7 +50,7 @@ void setup() {
   // override the default CS, reset, and IRQ pins (optional)
   LoRa.setPins(csPin, resetPin, irqPin);// set CS, reset, IRQ pin
 
-  if (!LoRa.begin(433E6)) {             // initialize ratio at 915 MHz
+  if (!LoRa.begin(433E6)) {             // initialize ratio at 433 MHz
     Serial.println("LoRa init failed. Check your connections.");
     while (true);                       // if failed, do nothing
   }
@@ -63,17 +63,17 @@ void setup() {
 
 
 void loop() {
-  
+
   if (!waitForReply) {
     getDataFromPC();
     sendToRecive();
-    Serial.println("Send");
+    //Serial.println("Send");
     previousMillis = millis();
   }
   else{
   // parse for a packet, and call onReceive with the result:
   onReceive(LoRa.parsePacket());
-  Serial.print("wait");
+  //Serial.print("wait");
   if(millis() - previousMillis >= interval) { 
     previousMillis = millis();
     reSend();
@@ -170,7 +170,9 @@ void sendToRecive() {
     {
       msgCount = 0;
     }
-    waitForReply = true; 
+    waitForReply = true;
+
+    Serial.println("<Sending....>");
   }
 }
 
@@ -180,7 +182,9 @@ void reSend() {
 
     // send packet
     LoRa.beginPacket();
-    LoRa.write(msgCount);
+    LoRa.write(msgCount-1);
     LoRa.print(message);
     LoRa.endPacket();
+
+    Serial.println("<Retransmission....>");
 }

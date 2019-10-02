@@ -74,6 +74,8 @@ void sendACK() {
     LoRa.print(incomingMsgId);
     LoRa.print(">");
     LoRa.endPacket();
+
+    Serial.println("<Send_ACK>");
    
 }
 
@@ -89,6 +91,8 @@ void onReceive(int packetSize) {
   
   if (packetSize == 0) return;          // if there's no packet, return
 
+  Serial.println("<Receiving.....>");
+ 
   incomingMsgId = LoRa.read();
 
   while (LoRa.available() > 0 && newData == false) {
@@ -107,7 +111,8 @@ void onReceive(int packetSize) {
             newData = true;
         }
     }
-    
+
+    Serial.println("<checkMsgID.....>");
     String str(receivedChars);
     if(incomingMsgId == MsgId)
     {
@@ -120,6 +125,7 @@ void onReceive(int packetSize) {
     }
     else
     {
+      Serial.println("<Retransmission.....................................>");
       newData = false;
       waitForData = false;
       delay(1);
@@ -131,6 +137,7 @@ void showNewData() {
         Serial.print("<");
         Serial.print(receivedChars);
         Serial.println(">");
+        
         newData = false;
         waitForData = false;
         delay(1);
