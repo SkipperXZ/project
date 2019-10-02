@@ -101,23 +101,24 @@ def waitForArduino():
         
         msg = recvFromArduino()
 
-        if not startReceive:
-            #print("waiting for start message")
-            print (msg)
+            #print (msg)
+        
         if msg == bytearray("START",'utf-8'):
             startReceive = True
-
-        if msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
+        if msg == bytearray("Retransmission.....................................",'utf-8') or msg == bytearray("checkMsgID.....",'utf-8') or msg == bytearray("Receiving.....",'utf-8') or msg == bytearray("Send_ACK",'utf-8'):
+            print (msg)
+        elif msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
             img = img + msg
             print (msg)
-
         elif msg == bytearray("EOF",'utf-8') and startReceive:      
-            #print(bytearray(img,'utf-8'))
-            decodeImage(img.decode("utf-8"))
+            print(img.decode("utf-8"))
+            decodeImage(img)
             startReceive = False
             print("FINISH !!!!")
             img = b""
-      
+        else:
+            print("waiting for start message")
+
 #======================================
 
 def runTest():
@@ -149,7 +150,8 @@ def runTest():
 countImg = 0
 def decodeImage(img):
     global countImg
-    image_64_decode = base64.b64decode(img + '=' * (-len(img) % 4))
+    #image_64_decode = base64.b64decode(img + bytearray('=','utf-8') * (-len(img) % 4))
+    image_64_decode = base64.b64decode(img)
 
     image_result = open('logo'+ str(countImg) +'.jpg', 'wb')
     image_result.write(image_64_decode)

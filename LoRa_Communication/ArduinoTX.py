@@ -125,9 +125,16 @@ def runTest(td):
         pass
         
       dataRecvd = recvFromArduino()
-      print (dataRecvd)
+      #print (dataRecvd)
       n += 1
+      
+      while dataRecvd == bytearray("Retransmission....",'utf-8') or dataRecvd == bytearray("Sending....",'utf-8'):
+        print(dataRecvd)
+        dataRecvd = b""
+        dataRecvd = recvFromArduino()
+      #print(dataRecvd)
       waitingForReply = False
+      #print(waitingForReply)
 
       print ("===========")
 
@@ -139,7 +146,7 @@ def encodeImage():
   
   global tempList
 
-  image = open('10kb.jpg', 'rb')
+  image = open('3kb.jpg', 'rb')
   image_read = image.read()
   image_64_encode = base64.encodebytes(image_read)
 
