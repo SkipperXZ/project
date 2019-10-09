@@ -1,15 +1,11 @@
 package com.example.droneapp.activity;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.example.droneapp.API;
 import com.example.droneapp.ImageAdapter;
-import com.example.droneapp.JSonPlaceHoldeApi;
+import com.example.droneapp.DroneApi;
 import com.example.droneapp.R;
-import com.example.droneapp.model.Marker;
 
 import java.util.List;
 
@@ -26,7 +22,7 @@ public class GalleryActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ImageAdapter imageAdapter;
-    private JSonPlaceHoldeApi jsonPlaceHoldeApi;
+    private DroneApi jsonPlaceHoldeApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +44,7 @@ public class GalleryActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        jsonPlaceHoldeApi = retrofit.create((JSonPlaceHoldeApi.class));
+        jsonPlaceHoldeApi = retrofit.create((DroneApi.class));
         Call<List<String>> call = jsonPlaceHoldeApi.getImageUrls(userID,markerID);
         call.enqueue(new Callback<List<String>>() {
             @Override

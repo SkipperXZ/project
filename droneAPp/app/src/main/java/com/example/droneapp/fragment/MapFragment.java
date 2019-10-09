@@ -3,6 +3,7 @@ package com.example.droneapp.fragment;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,8 +25,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.example.droneapp.API;
-import com.example.droneapp.JSonPlaceHoldeApi;
+import com.example.droneapp.DroneApi;
 import com.example.droneapp.R;
+import com.example.droneapp.TEMP;
 import com.example.droneapp.activity.GalleryActivity;
 import com.example.droneapp.model.Marker;
 import com.google.android.gms.common.ConnectionResult;
@@ -34,38 +36,23 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private GoogleApiClient googleApiClient;
-    private MapView mapView;
+
     private GoogleMap gmap;
-    private double currentLat;
-    private double currentLon;
-    private JSonPlaceHoldeApi jsonPlaceHoldeApi;
-    private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
-    private Location location;
+    private DroneApi droneApi;
     private FusedLocationProviderClient fusedLocationClient;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
-
-        /*GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();*/
-
-
-
-
         return v;
     }
 
@@ -89,37 +76,100 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         }
 
     }
-
-    private void setMarker(String userID, final ClusterManager clusterManager)  {
+    private void setGridMap(String flightName,String userID){
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        jsonPlaceHoldeApi = retrofit.create((JSonPlaceHoldeApi.class));
-        Call<List<Marker>> call = jsonPlaceHoldeApi.getMarker(userID);
+        droneApi = retrofit.create((DroneApi.class));
+        Call<Flight> call = droneApi.getFlight(flightName,userID);
+
+        call.enqueue(new Callback<Flight>() {
+            @Override
+            public void onResponse(Call<Flight> call, Response<Flight> response) {
+                if(!response.isSuccessful()){
+                    Log.d("API",response.toString());
+                    return;
+                }
+                Log.d("API",response.toString());
+                Flight flight = response.body();
+                double maxLat=-0;
+                double minLat=0;
+                double maxLon=0;
+                double minLon=0;
+                if(flight != null) {
+                    for (int i = 0; i < flight.getLatitudeList().size(); i++) {
+                        if (i == 0) {
+                            maxLat = flight.getLatitudeList().get(i);
+                            minLat = flight.getLatitudeList().get(i);
+                            maxLon = flight.getLongitudeList().get(i);
+                            minLon =flight.getLongitudeList().get(i);
+                        } else {
+                            if (maxLat <= flight.getLatitudeList().get(i))
+                                maxLat = flight.getLatitudeList().get(i);
+                            if (maxLon <= flight.getLongitudeList().get(i))
+                                maxLon = flight.getLongitudeList().get(i);
+                            if (minLat >= flight.getLatitudeList().get(i))
+                                minLat = flight.getLatitudeList().get(i);
+                            if (minLon >= flight.getLongitudeList().get(i))
+                                minLon =flight.getLongitudeList().get(i);
+                        }
+                    }
+
+                    Log.d("point", String.valueOf(maxLat));
+                    Log.d("point", String.valueOf(maxLon));
+                    Log.d("point", String.valueOf(minLat));
+                    Log.d("point", String.valueOf(minLon));
+
+                    PolylineOptions rectLine = new PolylineOptions()
+                            .add(new LatLng(maxLat, minLon))
+                            .add(new LatLng(minLat, minLon))
+                            .add(new LatLng(minLat, maxLon))
+                            .add(new LatLng(maxLat, maxLon))
+                            .add(new LatLng(maxLat, minLon))
+                            .width(3).zIndex(17)
+                            .color(Color.rgb(0x23, 0x92, 0x99));
+
+                    gmap.addPolyline(rectLine);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Flight> call, Throwable t) {
+                Log.d("API",t.toString());
+            }
+        });
+    }
+
+    private void setMarker(String userID, final ClusterManager clusterManager) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API.BASE_API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        droneApi = retrofit.create((DroneApi.class));
+        Call<List<Marker>> call = droneApi.getMarker(userID);
 
         call.enqueue(new Callback<List<Marker>>() {
             @Override
             public void onResponse(Call<List<Marker>> call, Response<List<Marker>> response) {
-                if(!response.isSuccessful()){
-                     return;
+                if (!response.isSuccessful()) {
+                    return;
                 }
 
-                Toast toast = Toast.makeText ( getActivity(), "Success", Toast.LENGTH_LONG );
-
+                Toast toast = Toast.makeText(getActivity(), "Success", Toast.LENGTH_LONG);
 
 
                 List<Marker> markers = response.body();
                 clusterManager.addItems(markers);
-                //Log.d("Retro","Before");
                 clusterManager.cluster();
             }
 
             @Override
             public void onFailure(Call<List<Marker>> call, Throwable t) {
-                // latLonText.setText(t.toString());
             }
         });
     }
@@ -129,15 +179,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         clusterManager.setOnClusterItemClickListener(clusterItemClickListener);
         googleMap.setOnMarkerClickListener(clusterManager);
         googleMap.setOnCameraIdleListener(clusterManager);
-        setMarker("joe",clusterManager);
-       /* List<User> items = getItems();
-         clusterManager.addItems(items);
-         clusterManager.cluster();*/
-
-
+        setMarker("joe", clusterManager);
 
     }
-
 
 
     @Override
@@ -146,7 +190,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         gmap.setMinZoomPreference(2);
         setCameraToCurrnetLocation(gmap);
         enableMyLocation(gmap);
-        setUpClusterManager(gmap);
+        setGridMap(TEMP.FLIGHT_NAME,TEMP.USER);
+        //setUpClusterManager(gmap);
 
     }
 
@@ -155,8 +200,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         @Override
         public boolean onClusterItemClick(Marker item) {
             Intent imageAcitivity = new Intent(getActivity(), GalleryActivity.class);
-            imageAcitivity.putExtra("markerID",item.getId());
-            imageAcitivity.putExtra("userID",item.getUserID());
+            imageAcitivity.putExtra("markerID", item.getId());
+            imageAcitivity.putExtra("userID", item.getUserID());
             startActivity(imageAcitivity);
 
             return true;
@@ -169,10 +214,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             googleMap.setMyLocationEnabled(true);
         }
     }
-    private void setCameraToCurrnetLocation(final GoogleMap gmap){
-        /*LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        Criteria mCriteria = new Criteria();
-        String bestProvider = String.valueOf(manager.getBestProvider(mCriteria, true));*/
+
+    private void setCameraToCurrnetLocation(final GoogleMap gmap) {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         fusedLocationClient.getLastLocation()
@@ -180,20 +223,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            Log.d("GPS",location.getLatitude() +" " +location.getLatitude());
-                            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()),15));
+                            Log.d("GPS", location.getLatitude() + " " + location.getLatitude());
+                            gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
                         }
                     }
                 });
-
-        /*if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location mLocation = manager.getLastKnownLocation(bestProvider);
-            Log.d("GPS",mLocation.getLongitude() +" " +mLocation.getLatitude());
-
-            Location location = LocationServices.getFusedLocationProviderClient(this);
-        }*/
-
 
 
 
@@ -214,12 +248,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
     }
 
-/*
-    @Override
-    public boolean onMarkerClick(com.google.android.gms.maps.model.Marker marker) {
-        marker.getTag()
-        Intent imageAcitivity = new Intent(getActivity(), GalleryActivity.class);
-        startActivity(imageAcitivity);
-        return true;
-    }*/
 }

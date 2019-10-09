@@ -14,6 +14,14 @@
         />
 
     <fragment
+        android:id="@+id/navigation_drone"
+        android:name="com.example.droneapp.fragment.DroneFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_drone"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        />
+
+    <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.droneapp.fragment.UploadFragment"
         android:label="@string/title_dashboard"

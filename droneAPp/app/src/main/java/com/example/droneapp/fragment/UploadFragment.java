@@ -29,7 +29,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.example.droneapp.API;
-import com.example.droneapp.JSonPlaceHoldeApi;
+import com.example.droneapp.DroneApi;
 import com.example.droneapp.R;
 import com.example.droneapp.model.ImageUploadForm;
 import com.google.android.gms.common.ConnectionResult;
@@ -50,7 +50,7 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
     private double lat;
     private double lon;
     private final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 99;
-    private JSonPlaceHoldeApi jsonPlaceHoldeApi;
+    private DroneApi jsonPlaceHoldeApi;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
@@ -83,7 +83,7 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        jsonPlaceHoldeApi = retrofit.create((JSonPlaceHoldeApi.class));
+        jsonPlaceHoldeApi = retrofit.create((DroneApi.class));
 
         LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 

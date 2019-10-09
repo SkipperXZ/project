@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ImageDetailRepository extends CrudRepository<ImageDetail, String> {
     List<ImageDetail> findAllByUserIDAndMarkerID(String userID,String markerID);
+
 }

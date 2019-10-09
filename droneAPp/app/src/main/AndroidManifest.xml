@@ -18,29 +18,18 @@
         >
 
         <activity android:name=".activity.PhotoViewActivity"></activity>
+        <activity android:name=".activity.RouteActivity"></activity>
+        <activity android:name=".activity.GalleryActivity"></activity>
+        <activity android:name=".activity.HomeActivity"></activity>
 
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.GalleryActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".activity.HomeActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAyf5btUcPfdfzNV7ea0fmVEznL8VYseLE" />

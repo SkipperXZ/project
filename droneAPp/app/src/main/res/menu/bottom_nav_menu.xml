@@ -12,6 +12,12 @@
         android:title="Camera" />
 
     <item
+        android:id="@+id/navigation_drone"
+        android:icon="@drawable/ic_pin_drop_black_24dp"
+        android:title="Drone"
+        />
+
+    <item
         android:id="@+id/navigation_notifications"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="Setting" />
