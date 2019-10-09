@@ -29,7 +29,7 @@ char previousReceivedChars[numChars] = "";
 boolean newData = false;
 
 void setup() {
-  Serial.begin(115200);                   // initialize serial
+  Serial.begin(250000);                   // initialize serial
   while (!Serial);
 
   LoRa.setSyncWord(0xF3);
@@ -70,7 +70,7 @@ void sendACK() {
   
     // send packet
     LoRa.beginPacket();
-    LoRa.print("<ACK_");
+    LoRa.print("ACK_");
     LoRa.print(incomingMsgId);
     LoRa.print(">");
     LoRa.endPacket();

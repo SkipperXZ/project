@@ -26,10 +26,14 @@ byte bytesRecvd = 0;
 boolean readInProgress = false;
 boolean newDataFromPC = false;
 boolean waitForReply = false;
+boolean newData = false;
+
+const byte numChars = 10;
+char receivedChars[numChars];
 
 byte msgCount = 0;
 
-long interval = 5000;
+long interval = 500;
 long previousMillis = 0;
 
 char messageFromPC[buffSize] = {0};
@@ -40,7 +44,7 @@ unsigned long curMillis;
 //========================================================================================
 
 void setup() {
-  Serial.begin(115200);                   // initialize serial
+  Serial.begin(250000);                   // initialize serial
   while (!Serial);
 
   LoRa.setSyncWord(0xF3);
@@ -71,6 +75,7 @@ void loop() {
     previousMillis = millis();
   }
   else{
+    //Serial.println("<WaitACK....>");
   // parse for a packet, and call onReceive with the result:
   onReceive(LoRa.parsePacket());
   //Serial.print("wait");
@@ -86,24 +91,40 @@ void loop() {
 //========================================================================================
 
 
+//========================================================================================
+
 void onReceive(int packetSize) {
-  if (packetSize == 0){
-      /*LoRa.beginPacket();
-      LoRa.print(message);
-      LoRa.endPacket();
-      return;*/
-      return;
-  }         // if there's no packet, return
 
-  String incoming = "";
-
-  while (LoRa.available()>0) {
-    incoming += (char)LoRa.read();
-  }
+  static byte ndx = 0;
+  char rc;
   
-  Serial.print(incoming);
+  if (packetSize == 0) return;          // if there's no packet, return
 
-  waitForReply = false;
+  //Serial.println("<Receiving.....>");
+
+  while (LoRa.available() > 0) {
+        rc = (char)LoRa.read();
+
+        if (rc != endMarker) {
+            receivedChars[ndx] = rc;
+            ndx++;
+            if (ndx >= numChars) {
+                ndx = numChars - 1;
+            }
+        }
+        else {
+            receivedChars[ndx] = '\0'; // terminate the string
+            ndx = 0;
+        }
+    }
+
+        Serial.print("<");
+        Serial.print(receivedChars);
+        Serial.println(">");
+        
+      
+        waitForReply = false;
+        delay(1);
 }
 
 
@@ -172,7 +193,7 @@ void sendToRecive() {
     }
     waitForReply = true;
 
-    Serial.println("<Sending....>");
+    //Serial.println("<Sending....>");
   }
 }
 

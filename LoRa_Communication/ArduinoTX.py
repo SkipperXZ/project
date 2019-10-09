@@ -125,11 +125,10 @@ def runTest(td):
         pass
         
       dataRecvd = recvFromArduino()
-      #print (dataRecvd)
+      print (dataRecvd)
       n += 1
       
-      while dataRecvd == bytearray("Retransmission....",'utf-8') or dataRecvd == bytearray("Sending....",'utf-8'):
-        print(dataRecvd)
+      while dataRecvd == bytearray("Retransmission....",'utf-8') :
         dataRecvd = b""
         dataRecvd = recvFromArduino()
       #print(dataRecvd)
@@ -212,7 +211,7 @@ print
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
 serPort = "COM6"
-baudRate = 115200
+baudRate = 250000
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
