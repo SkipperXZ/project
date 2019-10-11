@@ -1,8 +1,6 @@
 package com.example.droneapp.activity;
 
 import android.Manifest;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -11,12 +9,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.droneapp.API;
-import com.example.droneapp.DroneApi;
+import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
-import com.example.droneapp.TEMP;
-import com.example.droneapp.fragment.Flight;
-import com.example.droneapp.model.Marker;
+import com.example.droneapp.ulity.TEMP;
+import com.example.droneapp.model.Flight;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,19 +22,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.android.gms.maps.model.TileProvider;
-import com.google.android.gms.maps.model.UrlTileProvider;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;

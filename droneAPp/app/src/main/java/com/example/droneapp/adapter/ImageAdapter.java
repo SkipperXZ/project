@@ -1,10 +1,9 @@
-package com.example.droneapp;
+package com.example.droneapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.droneapp.activity.GalleryActivity;
+import com.example.droneapp.R;
 import com.example.droneapp.activity.PhotoViewActivity;
+import com.example.droneapp.ulity.API;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;

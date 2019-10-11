@@ -61,7 +61,7 @@ public class FlightController {
     @ResponseBody
     public  FlightRespond getAllImageUrlFromMarker(@RequestParam String flightName,@RequestParam String userID){
         Flight flight = flightService.getFlight(flightName,userID);
-        System.out.println(flight);
+
         if(flight != null) {
             String flightID = flight.getFlightID();
             String timeStamp = flight.getTimeStamp();

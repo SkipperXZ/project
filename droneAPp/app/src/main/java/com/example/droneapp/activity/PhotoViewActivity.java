@@ -22,5 +22,6 @@ public class PhotoViewActivity extends AppCompatActivity {
         PhotoView photoView = (PhotoView) findViewById(R.id.photo_view);
 
         photoView.setImageBitmap(bmp);
+
     }
 }

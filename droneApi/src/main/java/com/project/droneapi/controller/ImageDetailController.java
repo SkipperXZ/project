@@ -23,6 +23,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.MultipartConfigElement;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @RestController
@@ -53,8 +55,9 @@ public class ImageDetailController {
         Marker marker = new Marker();
 
 
-        marker.setMarkerLat(Math.floor(latitude * 1e4) / 1e4);
-        marker.setMarkerLon(Math.floor(longitude * 1e4) / 1e4);
+
+        marker.setMarkerLat(new BigDecimal(latitude).setScale(4, RoundingMode.HALF_UP).doubleValue());
+        marker.setMarkerLon(new BigDecimal(longitude).setScale(4, RoundingMode.HALF_UP).doubleValue());
         marker.setUserID(userID);
 
 

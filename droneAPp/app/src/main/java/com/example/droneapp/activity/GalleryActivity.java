@@ -2,9 +2,9 @@ package com.example.droneapp.activity;
 
 import android.os.Bundle;
 
-import com.example.droneapp.API;
-import com.example.droneapp.ImageAdapter;
-import com.example.droneapp.DroneApi;
+import com.example.droneapp.ulity.API;
+import com.example.droneapp.adapter.ImageAdapter;
+import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
 
 import java.util.List;

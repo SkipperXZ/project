@@ -1,15 +1,15 @@
-package com.example.droneapp.fragment;
+package com.example.droneapp.model;
 
 import java.util.List;
 
 public class Flight {
-    String flightID;
-    String flightName;
-    String deviceID;
-    String userID;
-    List<Double> latitudeList;
-    List<Double> longitudeList;
-    String timeStamp;
+    private String flightID;
+    private String flightName;
+    private String deviceID;
+    private String userID;
+    private List<Double> latitudeList;
+    private List<Double> longitudeList;
+    private String timeStamp;
 
     public Flight(String flightName, String deviceID, String userID, List<Double> latitudeList, List<Double> longitudeList, String timeStamp) {
         this.flightName = flightName;

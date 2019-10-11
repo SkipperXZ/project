@@ -1,7 +1,6 @@
-package com.example.droneapp;
+package com.example.droneapp.ulity;
 
-import com.example.droneapp.fragment.Flight;
-import com.example.droneapp.model.Base64Image;
+import com.example.droneapp.model.Flight;
 import com.example.droneapp.model.ImageUploadForm;
 import com.example.droneapp.model.Marker;
 
@@ -10,7 +9,6 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;

@@ -24,12 +24,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import com.example.droneapp.API;
+import com.example.droneapp.ulity.API;
 import com.example.droneapp.ClusterRenderer;
-import com.example.droneapp.DroneApi;
+import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
-import com.example.droneapp.TEMP;
+import com.example.droneapp.ulity.TEMP;
 import com.example.droneapp.activity.GalleryActivity;
+import com.example.droneapp.model.Flight;
 import com.example.droneapp.model.Marker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
