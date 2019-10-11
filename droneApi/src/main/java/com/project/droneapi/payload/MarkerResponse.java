@@ -1,27 +1,12 @@
-package com.example.droneapp.model;
+package com.project.droneapi.payload;
 
-import android.graphics.drawable.Icon;
+public class MarkerResponse {
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
-
-import androidx.annotation.NonNull;
-
-public class Marker implements ClusterItem {
     private String id;
     private String userID;
     private double markerLon;
     private double markerLat;
     private String icon;
-
-    public Marker(String id, String userID, double markerLon, double markerLat) {
-        this.id = id;
-        this.userID = userID;
-        this.markerLon = markerLon;
-        this.markerLat = markerLat;
-
-    }
 
     public String getId() {
         return id;
@@ -42,29 +27,17 @@ public class Marker implements ClusterItem {
     public double getMarkerLon() {
         return markerLon;
     }
+
     public void setMarkerLon(double markerLon) {
         this.markerLon = markerLon;
     }
+
     public double getMarkerLat() {
         return markerLat;
     }
+
     public void setMarkerLat(double markerLat) {
         this.markerLat = markerLat;
-    }
-
-    @Override
-    public LatLng getPosition() {
-        return new LatLng(markerLat,markerLon);
-    }
-
-    @Override
-    public String getTitle() {
-        return "";
-    }
-
-    @Override
-    public String getSnippet() {
-        return "";
     }
 
     public String getIcon() {
@@ -73,5 +46,6 @@ public class Marker implements ClusterItem {
     public void setIcon(String icon) {
         this.icon = icon;
     }
+
 
 }

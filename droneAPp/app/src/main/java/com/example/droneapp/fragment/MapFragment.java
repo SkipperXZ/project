@@ -25,6 +25,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.example.droneapp.API;
+import com.example.droneapp.ClusterRenderer;
 import com.example.droneapp.DroneApi;
 import com.example.droneapp.R;
 import com.example.droneapp.TEMP;
@@ -176,6 +177,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
     private void setUpClusterManager(GoogleMap googleMap) {
         ClusterManager<Marker> clusterManager = new ClusterManager(this.getContext(), googleMap);  // 3
+        ClusterRenderer clusterRenderer = new ClusterRenderer(getActivity(), googleMap, clusterManager);
         clusterManager.setOnClusterItemClickListener(clusterItemClickListener);
         googleMap.setOnMarkerClickListener(clusterManager);
         googleMap.setOnCameraIdleListener(clusterManager);
@@ -191,7 +193,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         setCameraToCurrnetLocation(gmap);
         enableMyLocation(gmap);
         setGridMap(TEMP.FLIGHT_NAME,TEMP.USER);
-        //setUpClusterManager(gmap);
+        setUpClusterManager(gmap);
 
     }
 

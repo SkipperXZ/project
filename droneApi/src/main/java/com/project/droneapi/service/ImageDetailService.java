@@ -37,5 +37,9 @@ public class ImageDetailService {
         return imageUrls;
     }
 
+    public String getFirstImageNameByMarker(String markerID){
+        return repository.findFirstByMarkerID(markerID).getImageID();
+    }
+
 
 }
