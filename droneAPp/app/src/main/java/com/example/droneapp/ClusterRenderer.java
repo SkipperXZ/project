@@ -50,10 +50,8 @@ public class ClusterRenderer extends DefaultClusterRenderer<Marker> {
 
     @Override
     protected void onBeforeClusterItemRendered(Marker markerItem, MarkerOptions markerOptions) {
-        /*if (markerItem.getIcon() != null) {
-            markerOptions.icon(markerItem.getIcon()); //Here you retrieve BitmapDescriptor from ClusterItem and set it as marker icon
-        }
-        markerOptions.visible(true);*/
+        Bitmap icon = clusterIconGenerator.makeIcon();
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
     }
 
     @Override

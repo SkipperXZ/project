@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="16dp"
+    android:layout_marginEnd="16dp"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_stop_flight"
+        android:layout_width="65dp"
+        android:layout_height="33dp"
+        android:layout_marginEnd="12dp"
+        android:text="Stop"
+        android:textSize="8sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tv_flight_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_flight_time" />
+
+    <TextView
+        android:id="@+id/tv_device_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Device name"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_flight_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_flight_name" />
+
+    <TextView
+        android:id="@+id/tv_flight_time"
+        android:layout_width="0dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginBottom="19dp"
+        android:text="Time 00:00:00"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_device_name"
+        app:layout_constraintEnd_toStartOf="@+id/btn_stop_flight"
+        app:layout_constraintStart_toEndOf="@+id/tv_device_name"
+        app:layout_constraintTop_toTopOf="@+id/tv_flight_name" />
+
+    <TextView
+        android:id="@+id/tv_flight_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="1dp"
+        android:text="Flight name"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toTopOf="@+id/tv_device_name"
+        app:layout_constraintEnd_toStartOf="@+id/tv_flight_time"
+        app:layout_constraintStart_toStartOf="@+id/tv_device_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
