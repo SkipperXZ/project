@@ -23,6 +23,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ActiveFlightFragement extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
+    private LinearLayoutManager linearLayoutManager;
     private DroneApi droneApi;
 
 
@@ -39,9 +41,13 @@ public class ActiveFlightFragement extends Fragment {
 
 
         recyclerView = (RecyclerView) v.findViewById(R.id.rv_active_flight);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new ActiveFlightAdapter(getFlightInfoList());
         recyclerView.setAdapter(adapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
 
         return v;

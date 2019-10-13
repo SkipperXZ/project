@@ -1,5 +1,6 @@
 package com.example.droneapp.ulity;
 
+import com.example.droneapp.model.Device;
 import com.example.droneapp.model.Flight;
 import com.example.droneapp.model.ImageUploadForm;
 import com.example.droneapp.model.Marker;
@@ -39,6 +40,15 @@ public interface DroneApi {
                                  @Field("longitudeList") List<Double> longitudeList,
                                  @Field("timeStamp") String timeStamp
     );
+    @FormUrlEncoded
+    @POST("device/createNewDevice")
+    Call<Boolean> createNewDevice(@Field("userID") String userID ,
+                                  @Field("deviceName") String deviceName,
+                                  @Field("deviceKey") String deviceKey
+                                 );
+
+    @GET("device/getDeviceByUser")
+    Call<List<Device>> getDeviceByUser(@Query("userID") String userID);
 
     @GET("getMarkerFromUser")
     Call<List<Marker>> getMarker(@Query("userID") String userID);
@@ -48,4 +58,6 @@ public interface DroneApi {
 
     @GET("getAllImageUrlFormMarker")
     Call<List<String>> getImageUrls (@Query("userID") String userID , @Query("markerID") String markerID );
+
+
 }

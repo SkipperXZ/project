@@ -21,6 +21,8 @@
         <activity android:name=".activity.RouteActivity"></activity>
         <activity android:name=".activity.GalleryActivity"></activity>
         <activity android:name=".activity.HomeActivity"></activity>
+        <activity android:name=".activity.AddNewDeviceActivity"></activity>
+        <activity android:name=".activity.ManageDeviceActivity"></activity>
 
         <activity android:name=".activity.LoginActivity">
             <intent-filter>
