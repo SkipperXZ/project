@@ -9,6 +9,6 @@ import java.util.List;
 public interface DeviceRepository extends CrudRepository<Device,String> {
     List<Device> findAllByUserID(String userID);
 
-    boolean existsByDeviceID(String deviceKey);
+    boolean existsByDeviceKey(String deviceKey);
 
 }

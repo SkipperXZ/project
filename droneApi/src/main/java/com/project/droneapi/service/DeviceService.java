@@ -22,7 +22,7 @@ public class DeviceService {
     }
 
     public boolean existDeviceKey(String deviceKey){
-        return deviceRepository.existsByDeviceID(deviceKey);
+        return deviceRepository.existsByDeviceKey(deviceKey);
 
     }
 }
