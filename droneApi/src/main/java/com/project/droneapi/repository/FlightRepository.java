@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface FlightRepository extends CrudRepository<Flight,String> {
     Flight findFirstByFlightNameAndUserID(String flightName, String userID);
+    List<Flight> findAllByUserID(String userID);
 
 }

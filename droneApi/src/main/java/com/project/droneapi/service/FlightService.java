@@ -21,4 +21,8 @@ public class FlightService {
         return flightRepository.findFirstByFlightNameAndUserID(flightName,userID);
     }
 
+    public List<Flight> getAllFlight(String userID){
+        return flightRepository.findAllByUserID(userID);
+    }
+
 }

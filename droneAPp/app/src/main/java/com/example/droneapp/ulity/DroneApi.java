@@ -2,6 +2,7 @@ package com.example.droneapp.ulity;
 
 import com.example.droneapp.model.Device;
 import com.example.droneapp.model.Flight;
+import com.example.droneapp.model.FlightInfo;
 import com.example.droneapp.model.ImageUploadForm;
 import com.example.droneapp.model.Marker;
 
@@ -55,6 +56,12 @@ public interface DroneApi {
 
     @GET("getFlight")
     Call<Flight> getFlight(@Query("flightName") String flightName ,@Query("userID") String userID);
+
+    @GET("getAllFlightInfo")
+    Call<List<FlightInfo>> getAllFlightInfo(@Query("userID") String userID);
+
+    @GET("getAllFlight")
+    Call<List<Flight>> getAllFlight(@Query("userID") String userID);
 
     @GET("getAllImageUrlFormMarker")
     Call<List<String>> getImageUrls (@Query("userID") String userID , @Query("markerID") String markerID );

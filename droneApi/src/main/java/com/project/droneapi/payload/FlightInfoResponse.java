@@ -1,18 +1,16 @@
-package com.example.droneapp.model;
+package com.project.droneapi.payload;
 
-public class FlightInfo {
+public class FlightInfoResponse {
     private String flightID;
     private String flightName;
     private String deviceName;
-    private String deviceID;
-    private String timeStamp;
 
-    public String getDeviceName() {
-        return deviceName;
-    }
-
-    public void setDeviceName(String deviceName) {
+    public FlightInfoResponse(String flightID, String flightName, String deviceName, String deviceID, String timeStamp) {
+        this.flightID = flightID;
+        this.flightName = flightName;
         this.deviceName = deviceName;
+        this.deviceID = deviceID;
+        this.timeStamp = timeStamp;
     }
 
     public String getFlightID() {
@@ -31,6 +29,14 @@ public class FlightInfo {
         this.flightName = flightName;
     }
 
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
     public String getDeviceID() {
         return deviceID;
     }
@@ -46,4 +52,7 @@ public class FlightInfo {
     public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
     }
+
+    private String deviceID;
+    private String timeStamp;
 }

@@ -42,13 +42,13 @@ public class DeviceController {
 
     @GetMapping("/device/getDeviceByUser")
     @ResponseBody
-    public List<DeviceResponse> getAllDeviceByUser(@RequestParam String userID){
-        List<Device> deviceList = deviceService.getAllDeviceByUser(userID);
+    public List<Device> getAllDeviceByUser(@RequestParam String userID){
+        /*List<Device> deviceList =
         List<DeviceResponse> deviceResponseList = new ArrayList<>();
         for (Device d:deviceList) {
             deviceResponseList.add(new DeviceResponse(d.getUserID(),d.getDeviceName(),d.getDeviceKey()));
-        }
-        return deviceResponseList;
+        }*/
+        return deviceService.getAllDeviceByUser(userID);
     }
 
 }

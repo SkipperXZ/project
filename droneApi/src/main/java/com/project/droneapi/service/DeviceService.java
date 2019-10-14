@@ -25,4 +25,8 @@ public class DeviceService {
         return deviceRepository.existsByDeviceKey(deviceKey);
 
     }
+
+    public Device getDeviceByDeviceID(String deviceID){
+        return deviceRepository.findByDeviceID(deviceID);
+    }
 }

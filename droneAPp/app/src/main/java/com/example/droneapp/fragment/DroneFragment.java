@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.droneapp.R;
+import com.example.droneapp.activity.NewFlightActivity;
 import com.example.droneapp.activity.RouteActivity;
 import com.example.droneapp.adapter.FlightPageAdapter;
 import com.google.android.material.tabs.TabLayout;
@@ -18,7 +19,7 @@ import androidx.viewpager.widget.ViewPager;
 
 public class DroneFragment extends Fragment {
 
-    private Button btn_gotomap ;
+    private Button btn_new_flight ;
     private ViewPager pager;
     private TabLayout tabLayout;
 
@@ -26,6 +27,15 @@ public class DroneFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_drone, container, false);
         tabLayout = (TabLayout) v.findViewById(R.id.tab_layout);
+        btn_new_flight = (Button) v.findViewById(R.id.btn_new_flight);
+
+        btn_new_flight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newFlightActivity();
+            }
+        });
+
       /*  btn_gotomap = v.findViewById(R.id.btn_gotomap);
 
         btn_gotomap.setOnClickListener(new View.OnClickListener() {
@@ -48,6 +58,11 @@ public class DroneFragment extends Fragment {
     }
     private void newSetRouteActivity(){
         Intent intent = new Intent(getActivity(), RouteActivity.class);
+        startActivity(intent);
+    }
+
+    private void newFlightActivity(){
+        Intent intent = new Intent(getActivity(), NewFlightActivity.class);
         startActivity(intent);
     }
 }

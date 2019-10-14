@@ -10,5 +10,6 @@ public interface DeviceRepository extends CrudRepository<Device,String> {
     List<Device> findAllByUserID(String userID);
 
     boolean existsByDeviceKey(String deviceKey);
+    Device findByDeviceID(String deviceID);
 
 }

@@ -7,15 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.droneapp.R;
-import com.example.droneapp.adapter.ActiveFlightAdapter;
 import com.example.droneapp.adapter.SettingAdapter;
-import com.example.droneapp.model.FlightInfo;
-import com.jakewharton.threetenabp.AndroidThreeTen;
-
-import org.threeten.bp.LocalDateTime;
-
-import java.util.Arrays;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

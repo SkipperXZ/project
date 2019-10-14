@@ -1,9 +1,11 @@
 package com.project.droneapi.controller;
 
 import com.project.droneapi.model.*;
+import com.project.droneapi.payload.FlightInfoResponse;
 import com.project.droneapi.payload.FlightRespond;
 import com.project.droneapi.payload.UploadFileResponse;
 import com.project.droneapi.repository.DroneRouteRopository;
+import com.project.droneapi.service.DeviceService;
 import com.project.droneapi.service.DroneRouteService;
 import com.project.droneapi.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +24,19 @@ public class FlightController {
     FlightService flightService;
     @Autowired
     DroneRouteService droneRouteService;
+    @Autowired
+    DeviceService deviceService;
 
     @PostMapping("/flight")
     @ResponseBody
-    public FlightRespond createNewFlight (
-             @RequestParam String flightName
-            ,@RequestParam String deviceID
-            ,@RequestParam String userID
-            ,@RequestParam List<Double> latitudeList
-            ,@RequestParam List<Double> longitudeList
-            ,@RequestParam String timeStamp
-    ){
+    public FlightRespond createNewFlight(
+            @RequestParam String flightName
+            , @RequestParam String deviceID
+            , @RequestParam String userID
+            , @RequestParam List<Double> latitudeList
+            , @RequestParam List<Double> longitudeList
+            , @RequestParam String timeStamp
+    ) {
 
         Flight flight = new Flight();
         flight.setFlightName(flightName);
@@ -54,15 +58,16 @@ public class FlightController {
         }
 
 
-        return new FlightRespond(flightID,flightName,deviceID,userID,latitudeList,longitudeList,timeStamp);
+        return new FlightRespond(flightID, flightName, deviceID, userID, latitudeList, longitudeList, timeStamp);
 
     }
+
     @GetMapping("/getFlight")
     @ResponseBody
-    public  FlightRespond getAllImageUrlFromMarker(@RequestParam String flightName,@RequestParam String userID){
-        Flight flight = flightService.getFlight(flightName,userID);
+    public FlightRespond getFlight(@RequestParam String flightName, @RequestParam String userID) {
+        Flight flight = flightService.getFlight(flightName, userID);
 
-        if(flight != null) {
+        if (flight != null) {
             String flightID = flight.getFlightID();
             String timeStamp = flight.getTimeStamp();
             List<DroneRoute> droneRoutes = droneRouteService.getDroneRoute(flightID);
@@ -76,6 +81,57 @@ public class FlightController {
             FlightRespond flightRespond = new FlightRespond(flightID, flightName, flight.getDeviceID(), flight.getUserID(), latitudeList, longitudeList, flight.getTimeStamp());
 
             return flightRespond;
+        }
+        return null;
+
+
+    }
+
+    @GetMapping("/getAllFlight")
+    @ResponseBody
+    public List<FlightRespond> getAllFlight(@RequestParam String userID) {
+        List<Flight> flightList = flightService.getAllFlight(userID);
+        List<FlightRespond> flightRespondList = new ArrayList<>();
+        if (flightList != null) {
+            for (Flight flight : flightList
+            ) {
+                String flightID = flight.getFlightID();
+                String timeStamp = flight.getTimeStamp();
+                List<DroneRoute> droneRoutes = droneRouteService.getDroneRoute(flightID);
+                List<Double> latitudeList = new ArrayList<>();
+                List<Double> longitudeList = new ArrayList<>();
+
+                for (DroneRoute e : droneRoutes) {
+                    latitudeList.add(e.getRoutePointNumber(), e.getRoutePointLatitude());
+                    longitudeList.add(e.getRoutePointNumber(), e.getRoutePointLongitude());
+                }
+                flightRespondList.add(new FlightRespond(flightID, flight.getFlightName(), flight.getDeviceID(), flight.getUserID(), latitudeList, longitudeList, flight.getTimeStamp()));
+
+
+            }
+            return flightRespondList;
+        }
+        return null;
+
+
+    }
+
+
+    @GetMapping("/getAllFlightInfo")
+    @ResponseBody
+    public  List<FlightInfoResponse>  getAllFlightInfo(@RequestParam String userID){
+        List<Flight> flightList= flightService.getAllFlight(userID);
+        List<FlightInfoResponse> flightInfoResponseList = new ArrayList<>();
+        if(flightList != null) {
+            for (Flight flight :flightList
+            ) {
+                String deviceName = deviceService.getDeviceByDeviceID(flight.getDeviceID()).getDeviceName();
+                flightInfoResponseList.add(new FlightInfoResponse(flight.getFlightID(),flight.getFlightName(),deviceName,flight.getDeviceID(),flight.getTimeStamp()));
+
+
+            }
+            return flightInfoResponseList;
+
         }
         return null;
 

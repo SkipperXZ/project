@@ -1,13 +1,20 @@
 package com.example.droneapp.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.droneapp.ulity.API;
 import com.example.droneapp.ulity.DroneApi;
@@ -25,6 +32,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +47,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RouteActivity extends FragmentActivity implements OnMapReadyCallback {
+public class RouteActivity extends FragmentActivity implements OnMapReadyCallback  {
     private GoogleMap gmap;
 
     private Button btn_lookframe;
@@ -49,7 +60,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
     double maxLon=0;
     double minLon=0;
 
-    private List<LatLng> routePoints = new ArrayList<>();
+    private ArrayList<LatLng> routePoints = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,8 +172,7 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
         btn_go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadFlight(createNewFlight(TEMP.FLIGHT_NAME,TEMP.DEVICE_ID,TEMP.USER,routePoints,TEMP.TIME_STAMP));
-
+                captureScreen();
             }
         });
         btn_cancel = findViewById(R.id.btn_Cancel);
@@ -202,43 +212,59 @@ public class RouteActivity extends FragmentActivity implements OnMapReadyCallbac
 
     }
 
-    private void uploadFlight(Flight flight){
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+    private void captureScreen()
+    {
 
-        droneApi = retrofit.create((DroneApi.class));
-        Call<Flight> call = droneApi.createNewFlight(flight.getFlightName(),flight.getDeviceID(),flight.getUserID(),flight.getLatitudeList(),flight.getLongitudeList(),flight.getTimeStamp());
-        call.enqueue(new Callback<Flight>() {
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+            Bitmap bitmap;
             @Override
-            public void onResponse(Call<Flight> call, Response<Flight> response) {
-                if(!response.isSuccessful()){
-                    Log.d("API", response.toString());
-                    return;
-                }
-                Log.d("API", response.toString());
-                finish();
+            public void onSnapshotReady(Bitmap snapshot) {
+                // TODO Auto-generated method stub
+                bitmap = snapshot;
+                String path = saveToInternalStorage(bitmap);
+                sendDataBack(path);
             }
-
-            @Override
-            public void onFailure(Call<Flight> call, Throwable t) {
-
-            }
-        });
+        };
+        gmap.snapshot(callback);
     }
 
-    public Flight createNewFlight(String flightName, String deviceID,String userID,List<LatLng> routeLatLng,String timeStamp){
-        List<Double> latitudeList = new ArrayList<>();
-        List<Double> longitudeList= new ArrayList<>();;
+    private void sendDataBack(String imagePath){
 
-        for (LatLng e:
-             routePoints) {
-            latitudeList.add(e.latitude);
-            longitudeList.add(e.longitude);
+        Intent returnIntent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("routes",routePoints);
+        bundle.putString("mapCaptured",imagePath);
+        returnIntent.putExtras(bundle);
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
+    }
+
+
+
+
+
+    private String saveToInternalStorage(Bitmap bitmapImage){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File mypath=new File(directory,"capture.jpg");
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
-        return new Flight(flightName,deviceID,userID,latitudeList,longitudeList,timeStamp);
+        return directory.getAbsolutePath();
     }
 
 

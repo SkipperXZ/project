@@ -5,10 +5,10 @@ import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.droneapp.R;
+import com.example.droneapp.model.Flight;
 import com.example.droneapp.model.FlightInfo;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
@@ -46,7 +46,7 @@ public class ActiveFlightAdapter extends RecyclerView.Adapter<ActiveFlightAdapte
     @Override
     public void onBindViewHolder(@NonNull final FlightViewHolder holder, final int position) {
 
-        final LocalDateTime startFlightTime = flightInfoList.get(position).getStartTime();
+        final LocalDateTime startFlightTime = LocalDateTime.parse(flightInfoList.get(position).getTimeStamp());
 
         holder.tv_flight_name.setText(flightInfoList.get(position).getFlightName());
         holder.tv_device_name.setText(flightInfoList.get(position).getDeviceName());

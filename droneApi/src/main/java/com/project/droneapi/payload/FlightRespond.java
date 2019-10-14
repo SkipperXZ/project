@@ -19,6 +19,7 @@ public class FlightRespond {
         this.latitudeList = latitudeList;
         this.longitudeList = longitudeList;
         this.timeStamp = timeStamp;
+        this.flightID = flightID;
     }
 
     public String getFlightName() {
