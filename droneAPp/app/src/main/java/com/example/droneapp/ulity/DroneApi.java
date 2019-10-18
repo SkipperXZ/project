@@ -11,12 +11,16 @@ import java.util.List;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface DroneApi {
@@ -47,6 +51,13 @@ public interface DroneApi {
                                   @Field("deviceName") String deviceName,
                                   @Field("deviceKey") String deviceKey
                                  );
+    @FormUrlEncoded
+    @HTTP(method = "DELETE", path = "device/removeDevice", hasBody = true)
+    Call<Boolean> removeDevice(@Field("deviceID") String deviceID);
+
+    @FormUrlEncoded
+    @PUT("finishFlight")
+    Call<Boolean> finishFlight(@Field("flightID") String flightID);
 
     @GET("device/getDeviceByUser")
     Call<List<Device>> getDeviceByUser(@Query("userID") String userID);
@@ -60,11 +71,18 @@ public interface DroneApi {
     @GET("getAllFlightInfo")
     Call<List<FlightInfo>> getAllFlightInfo(@Query("userID") String userID);
 
+    @GET("getAllFlightInfoByDate")
+    Call<List<FlightInfo>> getAllFlightByDate(@Query("userID") String userID,@Query("date") String date);
+
+    @GET("getAllActiveFlightInfo")
+    Call<List<FlightInfo>> getAllActiveFlightInfo(@Query("userID") String userID);
+
     @GET("getAllFlight")
     Call<List<Flight>> getAllFlight(@Query("userID") String userID);
 
     @GET("getAllImageUrlFormMarker")
     Call<List<String>> getImageUrls (@Query("userID") String userID , @Query("markerID") String markerID );
+
 
 
 }

@@ -161,8 +161,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                 if (!response.isSuccessful()) {
                     return;
                 }
-
-                Toast toast = Toast.makeText(getActivity(), "Success", Toast.LENGTH_LONG);
+                Toast toast;
+                if(getActivity() != null)
+                    toast = Toast.makeText(getActivity(), "Success", Toast.LENGTH_LONG);
 
 
                 List<Marker> markers = response.body();

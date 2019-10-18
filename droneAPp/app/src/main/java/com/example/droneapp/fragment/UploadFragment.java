@@ -1,6 +1,7 @@
 package com.example.droneapp.fragment;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,8 +14,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,17 +34,32 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import com.example.droneapp.activity.NewFlightActivity;
+import com.example.droneapp.model.Device;
+import com.example.droneapp.model.Flight;
+import com.example.droneapp.model.FlightInfo;
 import com.example.droneapp.ulity.API;
 import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
 import com.example.droneapp.model.ImageUploadForm;
+import com.example.droneapp.ulity.TEMP;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class UploadFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -50,16 +71,54 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
     private double lat;
     private double lon;
     private final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 99;
-    private DroneApi jsonPlaceHoldeApi;
+    private DroneApi droneApi;
+    private Spinner spn_camera_flight;
+    private EditText edt_camera_flight_date;
+    private Button btn_date_picker;
+    final Calendar myCalendar = Calendar.getInstance();
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
+        AndroidThreeTen.init(getContext());
 
         takePhotoButton = (Button) v.findViewById(R.id.takePhotoButton);
         imagePreview = (ImageView) v.findViewById(R.id.perviewImage);
         latText = (TextView) v.findViewById(R.id.tv_lat);
         lonText = (TextView) v.findViewById(R.id.tv_long);
         uploadButton = (Button)v.findViewById(R.id.uploadButton);
+        spn_camera_flight = (Spinner)v.findViewById(R.id.spn_camera_flight) ;
+        edt_camera_flight_date = (EditText) v.findViewById(R.id.edt_camera_flight_date);
+        btn_date_picker = (Button)v.findViewById(R.id.btn_date_picker);
+        edt_camera_flight_date.setText("Not Use");
+        //myCalendar.setTime(new Date());
+        setFlightSpinnerItem();
+
+       /* final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                edt_camera_flight_date.setText(myCalendar.getTime().toString());
+                setFlightSpinnerItem();
+            }
+
+        };*/
+
+        btn_date_picker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               /* new DatePickerDialog(getContext(), date, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();*/
+            }
+        });
+
+
+
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,27 +131,48 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
             @Override
             public void onClick(View v) {
                 if(imageByte != null && lat !=0  && lon != 0) {
-                    ImageUploadForm imageUploadForm = new ImageUploadForm("joe",lat,lon,"today",imageByte);
+                    //LocalDateTime selectedTime = Instant.ofEpochMilli(myCalendar.getTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    ImageUploadForm imageUploadForm = new ImageUploadForm("joe",lat,lon, LocalDateTime.now().toString(),imageByte);
                     uploadPhoto(imageUploadForm);
                 }
             }
         });
 
+
+        return v;
+    }
+
+
+    private void setFlightSpinnerItem(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        jsonPlaceHoldeApi = retrofit.create((DroneApi.class));
 
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        droneApi = retrofit.create((DroneApi.class));
+        //LocalDateTime selectedTime = Instant.ofEpochMilli(myCalendar.getTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        Call<List<FlightInfo>> call = droneApi.getAllActiveFlightInfo(TEMP.USER);
+        call.enqueue(new Callback<List<FlightInfo>>() {
+            @Override
+            public void onResponse(Call<List<FlightInfo>> call, Response<List<FlightInfo>> response) {
 
+                //Log.d("API",response.toString());
+                if(!response.isSuccessful()){
+                }else {
 
+                    List<FlightInfo> flightInfoList= response.body();
+                    ArrayAdapter<FlightInfo> adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_dropdown_item_1line,flightInfoList);
+                    spn_camera_flight.setAdapter(adapter);
 
+                }
 
+            }
 
-
-        return v;
+            @Override
+            public void onFailure(Call<List<FlightInfo>> call, Throwable t) {
+            }
+        });
     }
 
     @Override
@@ -135,7 +215,7 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
 
 
     private void uploadPhoto(ImageUploadForm ap){
-        Call<ImageUploadForm> call = jsonPlaceHoldeApi.createImageUploadForm(ap.getUserID(),ap.getLatitude(),ap.getLongitude(),ap.getTimeStamp(),ap.getImageFile());
+        Call<ImageUploadForm> call = droneApi.createImageUploadForm(ap.getUserID(),ap.getLatitude(),ap.getLongitude(),ap.getTimeStamp(),ap.getImageFile());
         call.enqueue(new Callback<ImageUploadForm>() {
             @Override
             public void onResponse(Call<ImageUploadForm> call, Response<ImageUploadForm> response) {

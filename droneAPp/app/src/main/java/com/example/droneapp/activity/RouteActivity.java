@@ -41,11 +41,6 @@ import java.util.List;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RouteActivity extends FragmentActivity implements OnMapReadyCallback  {
     private GoogleMap gmap;

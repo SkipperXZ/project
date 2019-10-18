@@ -3,16 +3,29 @@ package com.project.droneapi.payload;
 public class FlightInfoResponse {
     private String flightID;
     private String flightName;
-    private String deviceName;
 
-    public FlightInfoResponse(String flightID, String flightName, String deviceName, String deviceID, String timeStamp) {
+    private String deviceID;
+    private String timeStamp;
+
+    private String deviceName;
+    private int statusCode;
+
+    public FlightInfoResponse(String flightID, String flightName, String deviceName, int statusCode, String deviceID, String timeStamp) {
         this.flightID = flightID;
         this.flightName = flightName;
         this.deviceName = deviceName;
+        this.statusCode = statusCode;
         this.deviceID = deviceID;
         this.timeStamp = timeStamp;
     }
 
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
     public String getFlightID() {
         return flightID;
     }
@@ -53,6 +66,4 @@ public class FlightInfoResponse {
         this.timeStamp = timeStamp;
     }
 
-    private String deviceID;
-    private String timeStamp;
 }

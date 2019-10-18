@@ -20,11 +20,13 @@ public class ImageDetail implements Serializable {
     private double latitude;
     @Column(name = "Lon")
     private double longitude;
-
+    @Column(name = "flight_id")
+    private String flightID;
     @Column(name = "image_time_stamp")
     private String timeStamp;
     @Column(name = "marker_id")
     private String markerID;
+
 
     public String getUuid() {
         return uuid;

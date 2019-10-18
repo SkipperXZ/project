@@ -18,9 +18,18 @@ public class Flight {
     private String deviceID;
     @Column(name = "userID")
     private String userID;
+    @Column(name  = "status_code")
+    private int statusCode;
+
     @Column(name = "timeStamp")
     private String timeStamp;
 
+    public int getStatusCode() {
+        return statusCode;
+    }
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
     public String getFlightID() {
         return flightID;
     }

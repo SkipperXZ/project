@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.example.droneapp.R;
 import com.example.droneapp.adapter.ManageDeviceAdapter;
@@ -32,6 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ManageDeviceActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
+
     private Button btn_add_new_device ;
     private DroneApi droneApi;
 
@@ -54,6 +56,7 @@ public class ManageDeviceActivity extends AppCompatActivity {
                 newAddDeviceActivity();
             }
         });
+
     }
 
     private void newAddDeviceActivity(){

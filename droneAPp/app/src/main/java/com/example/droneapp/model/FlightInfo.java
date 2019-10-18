@@ -6,6 +6,15 @@ public class FlightInfo {
     private String deviceName;
     private String deviceID;
     private String timeStamp;
+    private int statusCode;
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
 
     public String getDeviceName() {
         return deviceName;
@@ -45,5 +54,10 @@ public class FlightInfo {
 
     public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    @Override
+    public String toString() {
+        return this.flightName;            // What to display in the Spinner list.
     }
 }
