@@ -10,18 +10,21 @@ public class ImageUploadForm {
     private RequestBody longitude;
     private RequestBody timeStamp;
      private MultipartBody.Part imageFile;
+     private RequestBody flightID;
 
-    public ImageUploadForm(String userID, double latitude, double longitude, String timeStamp, byte[] imageFile) {
+    public ImageUploadForm(String userID, double latitude, double longitude,String flightID, String timeStamp, byte[] imageFile) {
         this.userID =
                 RequestBody.create(
                         MediaType.parse("multipart/form-data"), userID);
         this.latitude =
                 RequestBody.create(
                         MediaType.parse("multipart/form-data"),String.valueOf(latitude));
-        // add another part within the multipart request
         this.longitude =
                 RequestBody.create(
                         MediaType.parse("multipart/form-data"),String.valueOf(longitude));
+        this.flightID =
+                RequestBody.create(
+                        MediaType.parse("multipart/form-data"),flightID);
         this.timeStamp =
                 RequestBody.create(
                         MediaType.parse("multipart/form-data"), timeStamp);
@@ -30,6 +33,14 @@ public class ImageUploadForm {
 
     public RequestBody getUserID() {
         return userID;
+    }
+
+    public RequestBody getFlightID() {
+        return flightID;
+    }
+
+    public void setFlightID(RequestBody flightID) {
+        this.flightID = flightID;
     }
 
     public void setUserID(RequestBody userID) {

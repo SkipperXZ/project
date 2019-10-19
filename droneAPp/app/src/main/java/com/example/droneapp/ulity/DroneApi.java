@@ -33,6 +33,7 @@ public interface DroneApi {
     Call<ImageUploadForm> createImageUploadForm(@Part ("userID")RequestBody userID,
                                                 @Part("latitude") RequestBody latitude,
                                                 @Part("longitude") RequestBody longitude,
+                                                @Part("flightID") RequestBody flightID,
                                                 @Part("timeStamp") RequestBody timeStamp,
                                                 @Part MultipartBody.Part file
                                                 );
@@ -62,8 +63,11 @@ public interface DroneApi {
     @GET("device/getDeviceByUser")
     Call<List<Device>> getDeviceByUser(@Query("userID") String userID);
 
-    @GET("getMarkerFromUser")
+    @GET("marker/getMarkerFromUser")
     Call<List<Marker>> getMarker(@Query("userID") String userID);
+
+    @GET("marker/getMarkerByFlightID")
+    Call<List<Marker>> getMarkerByFlightID(@Query("flightID") String flightID);
 
     @GET("getFlight")
     Call<Flight> getFlight(@Query("flightName") String flightName ,@Query("userID") String userID);

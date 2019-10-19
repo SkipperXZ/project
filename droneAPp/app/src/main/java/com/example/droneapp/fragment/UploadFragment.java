@@ -131,8 +131,10 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
             @Override
             public void onClick(View v) {
                 if(imageByte != null && lat !=0  && lon != 0) {
+                    String flightID = ((FlightInfo) spn_camera_flight.getSelectedItem()).getFlightID();
+
                     //LocalDateTime selectedTime = Instant.ofEpochMilli(myCalendar.getTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-                    ImageUploadForm imageUploadForm = new ImageUploadForm("joe",lat,lon, LocalDateTime.now().toString(),imageByte);
+                    ImageUploadForm imageUploadForm = new ImageUploadForm(TEMP.USER,lat,lon,flightID, LocalDateTime.now().toString(),imageByte);
                     uploadPhoto(imageUploadForm);
                 }
             }
@@ -178,47 +180,49 @@ public class UploadFragment extends Fragment implements GoogleApiClient.Connecti
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bitmap bitmap = (Bitmap)data.getExtras().get("data");
-        imagePreview.setImageBitmap(bitmap);
+        if (data != null) {
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            imagePreview.setImageBitmap(bitmap);
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        imageByte = stream.toByteArray();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            imageByte = stream.toByteArray();
 
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                Log.d("GPS",location.getLatitude() +" " +location.getLatitude());
-                                lat = location.getLatitude();
-                                lon = location.getLongitude();
-                                if(location != null){
-                                    latText.setText("Your Latitude : "+lat);
-                                    lonText.setText("Your Longitude : "+lon);
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+                fusedLocationClient.getLastLocation()
+                        .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                if (location != null) {
+                                    Log.d("GPS", location.getLatitude() + " " + location.getLatitude());
+                                    lat = location.getLatitude();
+                                    lon = location.getLongitude();
+                                    if (location != null) {
+                                        latText.setText("Your Latitude : " + lat);
+                                        lonText.setText("Your Longitude : " + lon);
+                                    }
+                                } else {
+                                    latText.setText("please turn on GPS");
+                                    lonText.setText("please turn on GPS");
                                 }
-                            }else{
-                                latText.setText("please turn on GPS");
-                                lonText.setText("please turn on GPS");
                             }
-                        }
-                    });
+                        });
+            }
+
+
         }
-
-
-
     }
 
 
 
 
     private void uploadPhoto(ImageUploadForm ap){
-        Call<ImageUploadForm> call = droneApi.createImageUploadForm(ap.getUserID(),ap.getLatitude(),ap.getLongitude(),ap.getTimeStamp(),ap.getImageFile());
+        Call<ImageUploadForm> call = droneApi.createImageUploadForm(ap.getUserID(),ap.getLatitude(),ap.getLongitude(),ap.getFlightID(),ap.getTimeStamp(),ap.getImageFile());
         call.enqueue(new Callback<ImageUploadForm>() {
             @Override
             public void onResponse(Call<ImageUploadForm> call, Response<ImageUploadForm> response) {
+                Log.d("api",response.toString());
                 if(!response.isSuccessful()){
                     //latLonText.setText(response.code());
                     Toast toast = Toast.makeText ( getActivity(), "Failed to upload", Toast.LENGTH_LONG );

@@ -157,6 +157,7 @@ public class FlightController {
     @GetMapping("/getAllFlightInfoByDate")
     @ResponseBody
     public  List<FlightInfoResponse>  getAllFlightInfo(@RequestParam String userID , @RequestParam String date){
+        System.out.println(date);
         return flightService.getAllFlightByDate(userID,date);
     }
 

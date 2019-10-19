@@ -23,10 +23,17 @@ public class ImageDetail implements Serializable {
     @Column(name = "flight_id")
     private String flightID;
     @Column(name = "image_time_stamp")
-    private String timeStamp;
+    private LocalDateTime timeStamp;
     @Column(name = "marker_id")
     private String markerID;
 
+    public String getFlightID() {
+        return flightID;
+    }
+
+    public void setFlightID(String flightID) {
+        this.flightID = flightID;
+    }
 
     public String getUuid() {
         return uuid;
@@ -64,10 +71,10 @@ public class ImageDetail implements Serializable {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-    public String getTimeStamp() {
+    public LocalDateTime getTimeStamp() {
         return timeStamp;
     }
-    public void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(LocalDateTime timeStamp) {
         this.timeStamp = timeStamp;
     }
 

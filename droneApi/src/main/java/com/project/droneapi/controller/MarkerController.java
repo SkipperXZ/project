@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/getMarkerFromUser")
+@RequestMapping("api/marker")
 public class MarkerController {
     @Autowired
     private MarkerService markerService;
@@ -27,7 +27,7 @@ public class MarkerController {
     @Autowired
     private ImageDetailService imageDetailService;
 
-    @GetMapping()
+    @GetMapping("/getMarkerFromUser")
     @ResponseBody
     public List<MarkerResponse> get(@RequestParam String userID) {
         List<Marker> markers = markerService.findByUserID(userID);
@@ -45,4 +45,13 @@ public class MarkerController {
         }
         return markerResponses;
     }
+
+    @GetMapping("/getMarkerByFlightID")
+    @ResponseBody
+    public List<MarkerResponse>getAllMarkerByFlightID(@RequestParam String flightID){
+        System.out.println(flightID);
+
+        return markerService.getMarkerResponseByFlightID(flightID);
+    }
+
 }

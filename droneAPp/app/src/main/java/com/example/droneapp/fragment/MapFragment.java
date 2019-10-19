@@ -1,15 +1,25 @@
 package com.example.droneapp.fragment;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.AndroidException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,6 +34,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import com.example.droneapp.model.FlightInfo;
 import com.example.droneapp.ulity.API;
 import com.example.droneapp.ClusterRenderer;
 import com.example.droneapp.ulity.DroneApi;
@@ -44,7 +55,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.clustering.ClusterManager;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -52,11 +73,121 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     private GoogleMap gmap;
     private DroneApi droneApi;
     private FusedLocationProviderClient fusedLocationClient;
+    private Button btn_filter_date;
+    private EditText edt_filter_date;
+    private Spinner spn_filter_flight;
+    private ClusterManager<Marker> clusterManager;
+    final Calendar myCalendar = Calendar.getInstance();
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
+        btn_filter_date = v.findViewById(R.id.btn_date_picker);
+        edt_filter_date = v.findViewById(R.id.edt_filter_flight_date);
+        spn_filter_flight = v.findViewById(R.id.spn_filter_flight);
+        edt_filter_date.setEnabled(false);
+        AndroidThreeTen.init(getContext());
+        final SharedPreferences sp = getActivity().getSharedPreferences("PREF_NAME", Context.MODE_PRIVATE);
+        Log.d("shared",sp.getString("filter_date",null));
+
+
+        if(sp.getString("filter_date",null) == null) {
+            myCalendar.setTime(new Date());
+            edt_filter_date.setText(myCalendar.getTime().toString());
+        }else {
+            try {
+                DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+                Date date = isoFormat.parse(sp.getString("filter_date",null));
+                myCalendar.setTime(date);
+                edt_filter_date.setText(myCalendar.getTime().toString());
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                edt_filter_date.setText(myCalendar.getTime().toString());
+                sp.edit().putString("filter_date",isoFormat.format(myCalendar.getTime())).commit();
+                setFlightSpinnerItem();
+
+            }
+
+        };
+        btn_filter_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(getContext(), date, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        spn_filter_flight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()  {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                gmap.clear();
+                setUpClusterManager(gmap);
+                setMarker(clusterManager);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+
         return v;
     }
+
+
+    private void setFlightSpinnerItem(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API.BASE_API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+
+        droneApi = retrofit.create((DroneApi.class));
+        LocalDateTime selectedTime = Instant.ofEpochMilli(myCalendar.getTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        Call<List<FlightInfo>> call = droneApi.getAllFlightByDate(TEMP.USER,selectedTime.toString());
+        call.enqueue(new Callback<List<FlightInfo>>() {
+            @Override
+            public void onResponse(Call<List<FlightInfo>> call, Response<List<FlightInfo>> response) {
+                if(!response.isSuccessful()){
+                }else {
+
+                    List<FlightInfo> flightInfoList= response.body();
+                    ArrayAdapter<FlightInfo> adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_dropdown_item_1line,flightInfoList);
+                    spn_filter_flight.setAdapter(adapter);
+                    if(!flightInfoList.isEmpty()) {
+                        setMarker(clusterManager);
+                    }else {
+                        gmap.clear();
+                        setUpClusterManager(gmap);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<FlightInfo>> call, Throwable t) {
+            }
+        });
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -145,7 +276,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         });
     }
 
-    private void setMarker(String userID, final ClusterManager clusterManager) {
+    private void setMarker( final ClusterManager clusterManager) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API.BASE_API_URL)
@@ -153,7 +284,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<List<Marker>> call = droneApi.getMarker(userID);
+        Call<List<Marker>> call = droneApi.getMarkerByFlightID(((FlightInfo)spn_filter_flight.getSelectedItem()).getFlightID());
 
         call.enqueue(new Callback<List<Marker>>() {
             @Override
@@ -178,12 +309,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     }
 
     private void setUpClusterManager(GoogleMap googleMap) {
-        ClusterManager<Marker> clusterManager = new ClusterManager(this.getContext(), googleMap);  // 3
+        clusterManager = new ClusterManager(this.getContext(), googleMap);  // 3
         ClusterRenderer clusterRenderer = new ClusterRenderer(getActivity(), googleMap, clusterManager);
         clusterManager.setOnClusterItemClickListener(clusterItemClickListener);
         googleMap.setOnMarkerClickListener(clusterManager);
         googleMap.setOnCameraIdleListener(clusterManager);
-        setMarker("joe", clusterManager);
+
 
     }
 
@@ -192,10 +323,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     public void onMapReady(GoogleMap googleMap) {
         gmap = googleMap;
         gmap.setMinZoomPreference(2);
-        setCameraToCurrnetLocation(gmap);
+        setCameraToCurrentLocation(gmap);
         enableMyLocation(gmap);
         setGridMap(TEMP.FLIGHT_NAME,TEMP.USER);
         setUpClusterManager(gmap);
+        setFlightSpinnerItem();
 
     }
 
@@ -219,7 +351,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         }
     }
 
-    private void setCameraToCurrnetLocation(final GoogleMap gmap) {
+    private void setCameraToCurrentLocation(final GoogleMap gmap) {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         fusedLocationClient.getLastLocation()
@@ -233,6 +365,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                     }
                 });
 
+
+
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
 
     }
@@ -251,5 +392,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
 
 }
