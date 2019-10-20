@@ -12,7 +12,7 @@ public interface MarkerRepository extends CrudRepository<Marker, String> {
     List<Marker> findByUserID(String userID);
     Marker findByUserIDAndMarkerLatAndMarkerLon(String userID,double markerLat,double markerLon);
 
-    @Query(value = "SELECT DISTINCT m.* FROM appdatabase.marker AS m INNER JOIN image_detail AS i ON m.id = i.marker_id WHERE i.flight_id = ?1",
+    @Query(value = "SELECT m.* FROM appdatabase.marker AS m INNER JOIN image_detail AS i ON m.id = i.marker_id WHERE i.flight_id = ?1 GROUP BY m.id",
             nativeQuery = true)
     List<Marker> findMarkerIDByFlightID(String flightID);
 }

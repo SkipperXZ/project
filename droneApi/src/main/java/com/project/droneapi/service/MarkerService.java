@@ -36,6 +36,11 @@ public class MarkerService {
 
     public List<MarkerResponse> getMarkerResponseByFlightID(String flightID){
         List<Marker> markers = repository.findMarkerIDByFlightID(flightID);
+        for (Marker m:
+             markers) {
+            System.out.println(m.getId());
+        }
+        System.out.println("------------------------------------");
         List<MarkerResponse>  markerResponses = new ArrayList<>();
         for (Marker m:
                 markers) {

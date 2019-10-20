@@ -55,6 +55,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
+import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.threeten.bp.Instant;
@@ -77,6 +79,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
     private EditText edt_filter_date;
     private Spinner spn_filter_flight;
     private ClusterManager<Marker> clusterManager;
+    private boolean isMapSet = false;
     final Calendar myCalendar = Calendar.getInstance();
 
 
@@ -114,13 +117,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+                Date oldTime = myCalendar.getTime();
                 // TODO Auto-generated method stub
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 edt_filter_date.setText(myCalendar.getTime().toString());
-                sp.edit().putString("filter_date",isoFormat.format(myCalendar.getTime())).commit();
-                setFlightSpinnerItem();
+
+                if(oldTime.compareTo(myCalendar.getTime()) != 0) {
+                    sp.edit().putString("filter_date", isoFormat.format(myCalendar.getTime())).commit();
+                    setFlightSpinnerItem();
+                }
 
             }
 
@@ -136,9 +143,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         spn_filter_flight.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()  {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                gmap.clear();
-                setUpClusterManager(gmap);
-                setMarker(clusterManager);
+
+                if(!isMapSet) {
+                    clusterManager.clearItems();
+                    setMarker(clusterManager);
+                }else {
+                    isMapSet = false;
+                }
             }
 
             @Override
@@ -173,10 +184,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                     ArrayAdapter<FlightInfo> adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_dropdown_item_1line,flightInfoList);
                     spn_filter_flight.setAdapter(adapter);
                     if(!flightInfoList.isEmpty()) {
+                        gmap.clear();
+                        clusterManager.clearItems();
                         setMarker(clusterManager);
                     }else {
                         gmap.clear();
-                        setUpClusterManager(gmap);
+                        clusterManager.clearItems();
                     }
                 }
 
@@ -298,6 +311,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
 
                 List<Marker> markers = response.body();
+                /*for (Marker m:
+                     markers) {
+                    Log.d("marker",m.getId());
+
+                }
+                Log.d("marker","--------------------------");*/
                 clusterManager.addItems(markers);
                 clusterManager.cluster();
             }
@@ -314,8 +333,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         clusterManager.setOnClusterItemClickListener(clusterItemClickListener);
         googleMap.setOnMarkerClickListener(clusterManager);
         googleMap.setOnCameraIdleListener(clusterManager);
-
-
     }
 
 
@@ -327,7 +344,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         enableMyLocation(gmap);
         setGridMap(TEMP.FLIGHT_NAME,TEMP.USER);
         setUpClusterManager(gmap);
+        Log.d("marker","map");
+        isMapSet = true;
         setFlightSpinnerItem();
+
+
 
     }
 
