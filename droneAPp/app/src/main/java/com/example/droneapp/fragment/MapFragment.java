@@ -338,6 +338,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
             Intent imageAcitivity = new Intent(getActivity(), GalleryActivity.class);
             imageAcitivity.putExtra("markerID", item.getId());
             imageAcitivity.putExtra("userID", item.getUserID());
+            imageAcitivity.putExtra("flightID", ((FlightInfo)spn_filter_flight.getSelectedItem()).getFlightID());
             startActivity(imageAcitivity);
 
             return true;

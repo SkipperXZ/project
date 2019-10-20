@@ -1,5 +1,6 @@
 package com.project.droneapi.service;
 
+import com.project.droneapi.model.ImageDetail;
 import com.project.droneapi.model.Marker;
 import com.project.droneapi.payload.MarkerResponse;
 import com.project.droneapi.repository.MarkerRepository;
@@ -38,13 +39,16 @@ public class MarkerService {
         List<MarkerResponse>  markerResponses = new ArrayList<>();
         for (Marker m:
                 markers) {
-            MarkerResponse markerResponse = new MarkerResponse();
-            markerResponse.setId(m.getId());
-            markerResponse.setMarkerLat(m.getMarkerLat());
-            markerResponse.setMarkerLon(m.getMarkerLon());
-            markerResponse.setUserID(m.getUserID());
-            markerResponse.setIcon(imageDetailService.getFirstImageNameByMarker(m.getId()));
-            markerResponses.add(markerResponse);
+            ImageDetail imageDetail = imageDetailService.getFirstImageNameByMarkerAndFlightID(m.getId(),flightID);
+            if(imageDetail != null) {
+                MarkerResponse markerResponse = new MarkerResponse();
+                markerResponse.setId(m.getId());
+                markerResponse.setMarkerLat(m.getMarkerLat());
+                markerResponse.setMarkerLon(m.getMarkerLon());
+                markerResponse.setUserID(m.getUserID());
+                markerResponse.setIcon(imageDetail.getImageID());
+                markerResponses.add(markerResponse);
+            }
         }
         return markerResponses;
     };

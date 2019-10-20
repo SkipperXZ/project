@@ -8,8 +8,10 @@ import java.awt.*;
 import java.util.List;
 
 public interface ImageDetailRepository extends CrudRepository<ImageDetail, String> {
-    List<ImageDetail> findAllByUserIDAndMarkerID(String userID,String markerID);
+    List<ImageDetail> findAllByUserIDAndMarkerIDAndFlightID(String userID,String markerID,String flightID);
 
     ImageDetail findFirstByMarkerID(String markerID);
+
+    ImageDetail findFirstByMarkerIDAndFlightID(String markerID,String flightID);
 
 }

@@ -84,8 +84,8 @@ public interface DroneApi {
     @GET("getAllFlight")
     Call<List<Flight>> getAllFlight(@Query("userID") String userID);
 
-    @GET("getAllImageUrlFormMarker")
-    Call<List<String>> getImageUrls (@Query("userID") String userID , @Query("markerID") String markerID );
+    @GET("getAllImageUrlByMarkerIDAndFlightID")
+    Call<List<String>> getImageUrls (@Query("userID") String userID , @Query("markerID") String markerID,@Query("flightID") String flightID );
 
 
 

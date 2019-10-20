@@ -33,19 +33,20 @@ public class GalleryActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         String markerID = getIntent().getExtras().getString("markerID");
-        setImageAdater("joe",markerID);
+        String flightID = getIntent().getExtras().getString("flightID");
+        setImageAdater("joe",markerID,flightID);
 
 
     }
 
-    private void setImageAdater (String userID,String markerID){
+    private void setImageAdater (String userID,String markerID,String flightID){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(API.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         jsonPlaceHoldeApi = retrofit.create((DroneApi.class));
-        Call<List<String>> call = jsonPlaceHoldeApi.getImageUrls(userID,markerID);
+        Call<List<String>> call = jsonPlaceHoldeApi.getImageUrls(userID,markerID,flightID);
         call.enqueue(new Callback<List<String>>() {
             @Override
             public void onResponse(Call<List<String>> call, Response<List<String>> response) {

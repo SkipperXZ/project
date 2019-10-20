@@ -107,11 +107,13 @@ public class ImageDetailController {
                 .body(new ByteArrayResource(dbFile.getData()));
     }
 
-    @GetMapping("/getAllImageUrlFormMarker")
+    @GetMapping("/getAllImageUrlByMarkerIDAndFlightID")
     @ResponseBody
-    public  List<String> getAllImageUrlFromMarker(@RequestParam String userID,@RequestParam String markerID){
-        return  imageDetailService.getAllImageUrlFromMarker(userID,markerID);
+    public  List<String> getAllImageUrlByMarkerIDAndFlightIDr(@RequestParam String userID,@RequestParam String markerID,@RequestParam String flightID){
+        return  imageDetailService.getFirstImageNameByMarkerAndFlightID(userID,markerID,flightID);
     }
+
+
 
 
 
