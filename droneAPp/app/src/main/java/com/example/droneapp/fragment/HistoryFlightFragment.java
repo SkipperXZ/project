@@ -1,5 +1,7 @@
 package com.example.droneapp.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,9 +11,8 @@ import android.view.ViewGroup;
 import com.example.droneapp.R;
 import com.example.droneapp.adapter.FlightAdapter;
 import com.example.droneapp.model.FlightInfo;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ulity.DroneApi;
-import com.example.droneapp.ulity.TEMP;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class HistoryFlightFragment extends Fragment {
         recyclerView = (RecyclerView) v.findViewById(R.id.rv_history_flight);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
-        setActiveFlightAdapter(TEMP.USER);
+        setActiveFlightAdapter();
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 linearLayoutManager.getOrientation());
@@ -56,14 +57,17 @@ public class HistoryFlightFragment extends Fragment {
 
 
 
-    private void setActiveFlightAdapter (String userID){
+    private void setActiveFlightAdapter (){
+        SharedPreferences sp = getActivity().getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<List<FlightInfo>> call = droneApi.getAllFlightInfo(userID);
+        Call<List<FlightInfo>> call = droneApi.getAllFlightInfo("Bearer "+token);
         call.enqueue(new Callback<List<FlightInfo>>() {
             @Override
             public void onResponse(Call<List<FlightInfo>> call, Response<List<FlightInfo>> response) {
@@ -82,7 +86,7 @@ public class HistoryFlightFragment extends Fragment {
                         }
 
 
-                        Log.d("API", flightInfoList.get(0).getFlightName());
+                        Log.d("Constant", flightInfoList.get(0).getFlightName());
                         RecyclerView.Adapter adapter = new FlightAdapter(historyFlightInfoList,HISTORY_ADAPTER_CODE);
                         recyclerView.setAdapter(adapter);
                     }

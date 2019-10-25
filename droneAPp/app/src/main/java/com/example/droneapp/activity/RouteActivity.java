@@ -10,17 +10,12 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
-import com.example.droneapp.ulity.API;
 import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
-import com.example.droneapp.ulity.TEMP;
-import com.example.droneapp.model.Flight;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,12 +27,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;

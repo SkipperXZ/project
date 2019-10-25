@@ -6,15 +6,13 @@ public class Flight {
     private String flightID;
     private String flightName;
     private String deviceID;
-    private String userID;
     private List<Double> latitudeList;
     private List<Double> longitudeList;
     private String timeStamp;
 
-    public Flight(String flightName, String deviceID, String userID, List<Double> latitudeList, List<Double> longitudeList, String timeStamp) {
+    public Flight(String flightName, String deviceID, List<Double> latitudeList, List<Double> longitudeList, String timeStamp) {
         this.flightName = flightName;
         this.deviceID = deviceID;
-        this.userID = userID;
         this.latitudeList = latitudeList;
         this.longitudeList = longitudeList;
         this.timeStamp = timeStamp;
@@ -42,14 +40,6 @@ public class Flight {
 
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;
-    }
-
-    public String getUserID() {
-        return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
     }
 
     public List<Double> getLatitudeList() {

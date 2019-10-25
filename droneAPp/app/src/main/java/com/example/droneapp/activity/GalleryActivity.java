@@ -1,8 +1,10 @@
 package com.example.droneapp.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.adapter.ImageAdapter;
 import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
@@ -34,19 +36,23 @@ public class GalleryActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         String markerID = getIntent().getExtras().getString("markerID");
         String flightID = getIntent().getExtras().getString("flightID");
-        setImageAdater("joe",markerID,flightID);
+        setImageAdater(markerID,flightID);
 
 
     }
 
-    private void setImageAdater (String userID,String markerID,String flightID){
+    private void setImageAdater (String markerID,String flightID){
+
+        SharedPreferences sp = getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         jsonPlaceHoldeApi = retrofit.create((DroneApi.class));
-        Call<List<String>> call = jsonPlaceHoldeApi.getImageUrls(userID,markerID,flightID);
+        Call<List<String>> call = jsonPlaceHoldeApi.getImageUrls("Bearer "+token,markerID,flightID);
         call.enqueue(new Callback<List<String>>() {
             @Override
             public void onResponse(Call<List<String>> call, Response<List<String>> response) {

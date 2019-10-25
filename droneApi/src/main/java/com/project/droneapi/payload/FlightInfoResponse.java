@@ -41,15 +41,12 @@ public class FlightInfoResponse {
     public void setFlightName(String flightName) {
         this.flightName = flightName;
     }
-
     public String getDeviceName() {
         return deviceName;
     }
-
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
     }
-
     public String getDeviceID() {
         return deviceID;
     }

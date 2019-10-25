@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.AndroidException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,11 +34,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.example.droneapp.model.FlightInfo;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ClusterRenderer;
 import com.example.droneapp.ulity.DroneApi;
 import com.example.droneapp.R;
-import com.example.droneapp.ulity.TEMP;
 import com.example.droneapp.activity.GalleryActivity;
 import com.example.droneapp.model.Flight;
 import com.example.droneapp.model.Marker;
@@ -55,8 +53,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
-import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import org.threeten.bp.Instant;
@@ -91,7 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         edt_filter_date.setEnabled(false);
         AndroidThreeTen.init(getContext());
         final SharedPreferences sp = getActivity().getSharedPreferences("PREF_NAME", Context.MODE_PRIVATE);
-        Log.d("shared",sp.getString("filter_date",null));
+        //Log.d("shared",sp.getString("filter_date",null));
 
 
         if(sp.getString("filter_date",null) == null) {
@@ -165,15 +161,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
 
     private void setFlightSpinnerItem(){
+        SharedPreferences sp = getActivity().getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
 
         droneApi = retrofit.create((DroneApi.class));
         LocalDateTime selectedTime = Instant.ofEpochMilli(myCalendar.getTime().getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-        Call<List<FlightInfo>> call = droneApi.getAllFlightByDate(TEMP.USER,selectedTime.toString());
+        Call<List<FlightInfo>> call = droneApi.getAllFlightByDate("Bearer "+token,selectedTime.toString());
         call.enqueue(new Callback<List<FlightInfo>>() {
             @Override
             public void onResponse(Call<List<FlightInfo>> call, Response<List<FlightInfo>> response) {
@@ -181,16 +180,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
                 }else {
 
                     List<FlightInfo> flightInfoList= response.body();
-                    ArrayAdapter<FlightInfo> adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_dropdown_item_1line,flightInfoList);
-                    spn_filter_flight.setAdapter(adapter);
-                    if(!flightInfoList.isEmpty()) {
-                        gmap.clear();
-                        clusterManager.clearItems();
-                        setMarker(clusterManager);
-                    }else {
-                        gmap.clear();
-                        clusterManager.clearItems();
+                    if(getActivity() != null) {
+                        ArrayAdapter<FlightInfo> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, flightInfoList);
+                        spn_filter_flight.setAdapter(adapter);
+                        if(!flightInfoList.isEmpty()) {
+                            gmap.clear();
+                            clusterManager.clearItems();
+                            setMarker(clusterManager);
+                        }else {
+                            gmap.clear();
+                            clusterManager.clearItems();
+                        }
                     }
+
                 }
 
             }
@@ -222,24 +224,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         }
 
     }
-    private void setGridMap(String flightName,String userID){
+    private void setGridMap(String flightName){
+
+        SharedPreferences sp = getActivity().getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<Flight> call = droneApi.getFlight(flightName,userID);
+        Call<Flight> call = droneApi.getFlight(flightName,token);
 
         call.enqueue(new Callback<Flight>() {
             @Override
             public void onResponse(Call<Flight> call, Response<Flight> response) {
                 if(!response.isSuccessful()){
-                    Log.d("API",response.toString());
+                    Log.d("Constant",response.toString());
                     return;
                 }
-                Log.d("API",response.toString());
+                Log.d("Constant",response.toString());
                 Flight flight = response.body();
                 double maxLat=-0;
                 double minLat=0;
@@ -284,20 +289,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
 
             @Override
             public void onFailure(Call<Flight> call, Throwable t) {
-                Log.d("API",t.toString());
+                Log.d("Constant",t.toString());
             }
         });
     }
 
     private void setMarker( final ClusterManager clusterManager) {
+        SharedPreferences sp = getActivity().getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<List<Marker>> call = droneApi.getMarkerByFlightID(((FlightInfo)spn_filter_flight.getSelectedItem()).getFlightID());
+        Call<List<Marker>> call = droneApi.getMarkerByFlightID("Bearer "+token,((FlightInfo)spn_filter_flight.getSelectedItem()).getFlightID());
 
         call.enqueue(new Callback<List<Marker>>() {
             @Override
@@ -342,7 +349,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback,GoogleAp
         gmap.setMinZoomPreference(2);
         setCameraToCurrentLocation(gmap);
         enableMyLocation(gmap);
-        setGridMap(TEMP.FLIGHT_NAME,TEMP.USER);
         setUpClusterManager(gmap);
         Log.d("marker","map");
         isMapSet = true;

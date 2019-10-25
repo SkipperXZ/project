@@ -1,6 +1,7 @@
 package com.example.droneapp.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,7 +12,7 @@ import android.widget.TextView;
 
 import com.example.droneapp.R;
 import com.example.droneapp.model.FlightInfo;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ulity.DroneApi;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
@@ -88,13 +89,16 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightView
     }
 
     public void setFinishFlight(final int position){
+        SharedPreferences sp = context.getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<Boolean> call = droneApi.finishFlight(flightInfoList.get(position).getFlightID());
+        Call<Boolean> call = droneApi.finishFlight("Bearer "+token,flightInfoList.get(position).getFlightID());
 
         call.enqueue(new Callback<Boolean>() {
             @Override

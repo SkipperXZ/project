@@ -1,6 +1,7 @@
 package com.example.droneapp.adapter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,8 @@ import android.widget.TextView;
 
 import com.example.droneapp.R;
 import com.example.droneapp.model.Device;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ulity.DroneApi;
-import com.example.droneapp.ulity.TEMP;
 
 import java.util.List;
 
@@ -56,17 +56,20 @@ public class ManageDeviceAdapter extends RecyclerView.Adapter<ManageDeviceAdapte
 
     public void removeDevice(final int position){
 
+        SharedPreferences sp =context.getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<Boolean> call = droneApi.removeDevice(deviceList.get(position).getDeviceID());
+        Call<Boolean> call = droneApi.removeDevice("Bearer "+token,deviceList.get(position).getDeviceID());
         call.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                Log.d("API",response.toString());
+                Log.d("Constant",response.toString());
                 if(!response.isSuccessful()){
 
                 }else {

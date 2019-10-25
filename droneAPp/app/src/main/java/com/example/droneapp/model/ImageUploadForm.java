@@ -12,10 +12,7 @@ public class ImageUploadForm {
      private MultipartBody.Part imageFile;
      private RequestBody flightID;
 
-    public ImageUploadForm(String userID, double latitude, double longitude,String flightID, String timeStamp, byte[] imageFile) {
-        this.userID =
-                RequestBody.create(
-                        MediaType.parse("multipart/form-data"), userID);
+    public ImageUploadForm(double latitude, double longitude,String flightID, String timeStamp, byte[] imageFile) {
         this.latitude =
                 RequestBody.create(
                         MediaType.parse("multipart/form-data"),String.valueOf(latitude));
