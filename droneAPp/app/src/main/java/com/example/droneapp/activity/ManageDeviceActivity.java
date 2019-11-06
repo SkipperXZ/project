@@ -1,26 +1,24 @@
 package com.example.droneapp.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.example.droneapp.R;
 import com.example.droneapp.adapter.ManageDeviceAdapter;
-import com.example.droneapp.adapter.SettingAdapter;
 import com.example.droneapp.model.Device;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ulity.DroneApi;
-import com.example.droneapp.ulity.TEMP;
 
 import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
@@ -32,6 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ManageDeviceActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
+
     private Button btn_add_new_device ;
     private DroneApi droneApi;
 
@@ -54,6 +53,7 @@ public class ManageDeviceActivity extends AppCompatActivity {
                 newAddDeviceActivity();
             }
         });
+
     }
 
     private void newAddDeviceActivity(){
@@ -62,13 +62,16 @@ public class ManageDeviceActivity extends AppCompatActivity {
     }
 
     private void setAdapter(){
+        SharedPreferences sp = getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<List<Device>> call = droneApi.getDeviceByUser(TEMP.USER);
+        Call<List<Device>> call = droneApi.getDeviceByUser("Bearer "+token);
         call.enqueue(new Callback<List<Device>>() {
             @Override
             public void onResponse(Call<List<Device>> call, Response<List<Device>> response) {

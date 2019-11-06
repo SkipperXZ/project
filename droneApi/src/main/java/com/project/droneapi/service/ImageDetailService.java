@@ -5,6 +5,7 @@ import com.project.droneapi.repository.ImageDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class ImageDetailService {
         return repository.save(imageDetail);
 
     }
-    public List<String> getAllImageUrlFromMarker(String userID,String markerID){
-        List<ImageDetail> imageDetails = repository.findAllByUserIDAndMarkerID(userID,markerID);
+    public List<String> getFirstImageNameByMarkerAndFlightID(String userID,String markerID,String flightID){
+        List<ImageDetail> imageDetails = repository.findAllByUserIDAndMarkerIDAndFlightID(userID,markerID,flightID);
         List<String>imageUrls = new ArrayList<>();
 
         for (ImageDetail e:
@@ -40,6 +41,11 @@ public class ImageDetailService {
     public String getFirstImageNameByMarker(String markerID){
         return repository.findFirstByMarkerID(markerID).getImageID();
     }
+
+    public ImageDetail getFirstImageNameByMarkerAndFlightID(String markerID,String flightID){
+        return repository.findFirstByMarkerIDAndFlightID(markerID,flightID);
+    }
+
 
 
 }

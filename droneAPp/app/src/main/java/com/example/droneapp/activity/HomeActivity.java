@@ -27,13 +27,6 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
 
 
-      //  logoutButton = findViewById(R.id.logoutButton);
-       /* logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newLoginAcrivity();
-            }
-        });*/
     }
 
     private void newLoginAcrivity(){

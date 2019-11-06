@@ -43,6 +43,7 @@ public class FlightController {
         flight.setDeviceID(deviceID);
         flight.setUserID(userID);
         flight.setTimeStamp(timeStamp);
+        flight.setStatusCode(1);
 
         String flightID = flightService.createNewFlight(flight).getFlightID();
 
@@ -125,8 +126,17 @@ public class FlightController {
         if(flightList != null) {
             for (Flight flight :flightList
             ) {
-                String deviceName = deviceService.getDeviceByDeviceID(flight.getDeviceID()).getDeviceName();
-                flightInfoResponseList.add(new FlightInfoResponse(flight.getFlightID(),flight.getFlightName(),deviceName,flight.getDeviceID(),flight.getTimeStamp()));
+
+                Device device = deviceService.getDeviceByDeviceID(flight.getDeviceID());
+                String deviceName;
+                if(device != null){
+                    deviceName = device.getDeviceName();
+                }else {
+                    deviceName = "REMOVED";
+                }
+                flightInfoResponseList.add(new FlightInfoResponse(flight.getFlightID(),flight.getFlightName(),deviceName,flight.getStatusCode(),flight.getDeviceID(),flight.getTimeStamp()));
+
+
 
 
             }
@@ -137,5 +147,26 @@ public class FlightController {
 
 
     }
+
+    @PutMapping("/finishFlight")
+    @ResponseBody
+    public boolean setFinishFlight(@RequestParam String flightID){
+        return flightService.setFinishFlight(flightID);
+    }
+
+    @GetMapping("/getAllFlightInfoByDate")
+    @ResponseBody
+    public  List<FlightInfoResponse>  getAllFlightInfo(@RequestParam String userID , @RequestParam String date){
+        System.out.println(date);
+        return flightService.getAllFlightByDate(userID,date);
+    }
+
+    @GetMapping("/getAllActiveFlightInfo")
+    @ResponseBody
+    public  List<FlightInfoResponse>  getAllActiveFlightInfo(@RequestParam String userID){
+        return flightService.getAllActiveFlight(userID);
+    }
+
+
 
 }

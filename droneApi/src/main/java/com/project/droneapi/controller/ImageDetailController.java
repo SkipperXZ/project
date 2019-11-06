@@ -25,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.MultipartConfigElement;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -44,12 +45,12 @@ public class ImageDetailController {
               @RequestParam String userID
             , @RequestParam double latitude
             , @RequestParam double longitude
+            , @RequestParam String flightID
             ,@RequestParam String timeStamp
             ,@RequestParam("file") MultipartFile imageFile
             ) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-
         DBFile dbFile = dbFileStorageService.storeFile(imageFile);
         ImageDetail imageDetail = new ImageDetail();
         Marker marker = new Marker();
@@ -69,7 +70,8 @@ public class ImageDetailController {
         imageDetail.setUserID(userID);
         imageDetail.setLatitude(latitude);
         imageDetail.setLongitude(longitude);
-        imageDetail.setTimeStamp(timeStamp);
+        imageDetail.setTimeStamp(LocalDateTime.parse(timeStamp));
+        imageDetail.setFlightID(flightID);
 
         if(existMarker != null){
             imageDetail.setMarkerID(existMarker.getId());
@@ -105,11 +107,13 @@ public class ImageDetailController {
                 .body(new ByteArrayResource(dbFile.getData()));
     }
 
-    @GetMapping("/getAllImageUrlFormMarker")
+    @GetMapping("/getAllImageUrlByMarkerIDAndFlightID")
     @ResponseBody
-    public  List<String> getAllImageUrlFromMarker(@RequestParam String userID,@RequestParam String markerID){
-        return  imageDetailService.getAllImageUrlFromMarker(userID,markerID);
+    public  List<String> getAllImageUrlByMarkerIDAndFlightIDr(@RequestParam String userID,@RequestParam String markerID,@RequestParam String flightID){
+        return  imageDetailService.getFirstImageNameByMarkerAndFlightID(userID,markerID,flightID);
     }
+
+
 
 
 

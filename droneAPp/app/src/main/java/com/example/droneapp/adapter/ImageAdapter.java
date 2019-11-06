@@ -2,6 +2,7 @@ package com.example.droneapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -11,11 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.droneapp.R;
 import com.example.droneapp.activity.PhotoViewActivity;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -29,7 +32,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     private List<String> imageUrls;
     private Context context;
-    private final String BASE_DOWNLOAD_URL = API.BASE_API_URL+"downloadFile/";
+    private final String BASE_DOWNLOAD_URL = Constant.BASE_API_URL+"downloadFile/";
     public  ImageAdapter(List<String> imageUrls){
         this.imageUrls = imageUrls;
     }
@@ -46,10 +49,22 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(final ImageViewHolder holder, final int position) {
-        final String imageUrl = imageUrls.get(position);
+
+        String url = BASE_DOWNLOAD_URL+ imageUrls.get(position);
+        SharedPreferences sp = context.getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
+        GlideUrl glideUrl = new GlideUrl(url, new LazyHeaders.Builder()
+                .addHeader("Authorization", "Bearer "+token)
+                .build());
+
+
+
+
+
         Glide.with(context)
                 .asBitmap()
-                .load(BASE_DOWNLOAD_URL+imageUrl)
+                .load(glideUrl)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

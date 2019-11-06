@@ -1,7 +1,6 @@
 package com.example.droneapp.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -9,7 +8,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -22,12 +23,10 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.example.droneapp.R;
-import com.example.droneapp.adapter.ManageDeviceAdapter;
 import com.example.droneapp.model.Device;
 import com.example.droneapp.model.Flight;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ulity.DroneApi;
-import com.example.droneapp.ulity.TEMP;
 import com.google.android.gms.maps.model.LatLng;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
@@ -76,7 +75,7 @@ public class NewFlightActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Device selectedDevice =(Device)spn_device_name.getSelectedItem();
-                Flight flight = createNewFlight(et_flight_name.getText().toString(),selectedDevice.getDeviceID(),TEMP.USER,routes, LocalDateTime.now().toString());
+                Flight flight = createNewFlight(et_flight_name.getText().toString(),selectedDevice.getDeviceID(),routes, LocalDateTime.now().toString());
                 uploadNewFlight(flight);
             }
         });
@@ -87,21 +86,26 @@ public class NewFlightActivity extends AppCompatActivity {
         startActivityForResult(intent,ROUTES_REQUEST_CODE);
     }
     private void setDeviceSpinnerItem(){
+        SharedPreferences sp = getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<List<Device>> call = droneApi.getDeviceByUser(TEMP.USER);
+        Call<List<Device>> call = droneApi.getAvailableDevice("Bearer "+token);
         call.enqueue(new Callback<List<Device>>() {
             @Override
             public void onResponse(Call<List<Device>> call, Response<List<Device>> response) {
                 if(!response.isSuccessful()){
                 }else {
                     deviceList = response.body();
-                    ArrayAdapter<Device> adapter = new ArrayAdapter<>(NewFlightActivity.this,android.R.layout.simple_dropdown_item_1line,deviceList);
-                    spn_device_name.setAdapter(adapter);
+                    if(!deviceList.isEmpty() ){
+                        ArrayAdapter<Device> adapter = new ArrayAdapter<>(NewFlightActivity.this, android.R.layout.simple_dropdown_item_1line, deviceList);
+                        spn_device_name.setAdapter(adapter);
+                    }
                 }
 
             }
@@ -113,21 +117,24 @@ public class NewFlightActivity extends AppCompatActivity {
     }
 
     private void uploadNewFlight(Flight flight){
+        SharedPreferences sp = getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<Flight> call = droneApi.createNewFlight(flight.getFlightName(),flight.getDeviceID(),flight.getUserID(),flight.getLatitudeList(),flight.getLongitudeList(),flight.getTimeStamp());
+        Call<Flight> call = droneApi.createNewFlight("Bearer " +token,flight.getFlightName(),flight.getDeviceID(),flight.getLatitudeList(),flight.getLongitudeList(),flight.getTimeStamp());
         call.enqueue(new Callback<Flight>() {
             @Override
             public void onResponse(Call<Flight> call, Response<Flight> response) {
                 if(!response.isSuccessful()){
-                    Log.d("API", response.toString());
+                    Log.d("Constant", response.toString());
                     return;
                 }
-                Log.d("API", response.toString());
+                Log.d("Constant", response.toString());
                 finish();
             }
 
@@ -169,7 +176,7 @@ public class NewFlightActivity extends AppCompatActivity {
 
     }
 
-    public Flight createNewFlight(String flightName, String deviceID,String userID,List<LatLng> routeLatLng,String timeStamp){
+    public Flight createNewFlight(String flightName, String deviceID,List<LatLng> routeLatLng,String timeStamp){
         List<Double> latitudeList = new ArrayList<>();
         List<Double> longitudeList= new ArrayList<>();;
 
@@ -179,6 +186,6 @@ public class NewFlightActivity extends AppCompatActivity {
             longitudeList.add(e.longitude);
         }
 
-        return new Flight(flightName,deviceID,userID,latitudeList,longitudeList,timeStamp);
+        return new Flight(flightName,deviceID,latitudeList,longitudeList,timeStamp);
     }
 }

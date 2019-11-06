@@ -1,5 +1,7 @@
 package com.example.droneapp.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,14 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.droneapp.R;
-import com.example.droneapp.adapter.ActiveFlightAdapter;
-import com.example.droneapp.model.Flight;
+import com.example.droneapp.adapter.FlightAdapter;
 import com.example.droneapp.model.FlightInfo;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.example.droneapp.ulity.DroneApi;
-import com.example.droneapp.ulity.TEMP;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -34,6 +35,7 @@ public class ActiveFlightFragement extends Fragment {
     private RecyclerView.Adapter adapter;
     private LinearLayoutManager linearLayoutManager;
     private DroneApi droneApi;
+    private final int ACTIVE_ADAPTER_CODE = 0;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,7 +46,7 @@ public class ActiveFlightFragement extends Fragment {
         recyclerView = (RecyclerView) v.findViewById(R.id.rv_active_flight);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
-        setActiveFlightAdapter(TEMP.USER);
+        setActiveFlightAdapter();
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 linearLayoutManager.getOrientation());
@@ -57,24 +59,39 @@ public class ActiveFlightFragement extends Fragment {
 
 
 
-    private void setActiveFlightAdapter (String userID){
+    private void setActiveFlightAdapter (){
+        SharedPreferences sp = getActivity().getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API.BASE_API_URL)
+                .baseUrl(Constant.BASE_API_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         droneApi = retrofit.create((DroneApi.class));
-        Call<List<FlightInfo>> call = droneApi.getAllFlightInfo(userID);
+        Call<List<FlightInfo>> call = droneApi.getAllFlightInfo("Bearer "+token);
         call.enqueue(new Callback<List<FlightInfo>>() {
             @Override
             public void onResponse(Call<List<FlightInfo>> call, Response<List<FlightInfo>> response) {
-                if(!response.isSuccessful()){
+                if (!response.isSuccessful()) {
 
-                }else{
+                } else {
                     List<FlightInfo> flightInfoList = response.body();
-                    Log.d("API",flightInfoList.get(0).getFlightName());
-                    RecyclerView.Adapter adapter = new ActiveFlightAdapter(flightInfoList);
-                    recyclerView.setAdapter(adapter);
+                    List<FlightInfo> activeFlightInfoList = new ArrayList<>();
+                    List<FlightInfo> historyFlightInfoList = new ArrayList<>();
+                    for (FlightInfo f :
+                            flightInfoList) {
+                        if (f.getStatusCode() == 1) {
+                            activeFlightInfoList.add(f);
+                        } else if (f.getStatusCode() == 0) {
+                            historyFlightInfoList.add(f);
+                        }
+
+
+                        Log.d("Constant", flightInfoList.get(0).getFlightName());
+                        RecyclerView.Adapter adapter = new FlightAdapter(activeFlightInfoList,ACTIVE_ADAPTER_CODE);
+                        recyclerView.setAdapter(adapter);
+                    }
                 }
             }
 

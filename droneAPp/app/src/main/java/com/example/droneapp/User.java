@@ -36,12 +36,4 @@ public class User implements ClusterItem {
         return "";
     }
 
-   /* @NonNull
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", latLng=" + latLng +
-                '}';
-    }*/
 }

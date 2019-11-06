@@ -4,6 +4,7 @@ import com.project.droneapi.model.Device;
 import com.project.droneapi.payload.DeviceResponse;
 import com.project.droneapi.payload.FlightRespond;
 import com.project.droneapi.service.DeviceService;
+import com.project.droneapi.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,8 @@ public class DeviceController {
 
     @Autowired
     DeviceService deviceService;
+    @Autowired
+    FlightService flightService;
 
 
     @PostMapping("/device/createNewDevice")
@@ -43,12 +46,19 @@ public class DeviceController {
     @GetMapping("/device/getDeviceByUser")
     @ResponseBody
     public List<Device> getAllDeviceByUser(@RequestParam String userID){
-        /*List<Device> deviceList =
-        List<DeviceResponse> deviceResponseList = new ArrayList<>();
-        for (Device d:deviceList) {
-            deviceResponseList.add(new DeviceResponse(d.getUserID(),d.getDeviceName(),d.getDeviceKey()));
-        }*/
+
         return deviceService.getAllDeviceByUser(userID);
+    }
+
+    @DeleteMapping("/device/removeDevice")
+    @ResponseBody
+    public boolean deleteDevice(@RequestParam String deviceID){
+        System.out.println(deviceID);
+        if(!flightService.isInFlightDevice(deviceID) && deviceService.isRemoveDevice(deviceID)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }

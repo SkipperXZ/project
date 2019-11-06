@@ -1,16 +1,20 @@
 package com.example.droneapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaderFactory;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.droneapp.model.Marker;
-import com.example.droneapp.ulity.API;
+import com.example.droneapp.ulity.Constant;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -27,7 +31,7 @@ import androidx.annotation.Nullable;
 
 public class ClusterRenderer extends DefaultClusterRenderer<Marker> {
     private Context context;
-    private final String BASE_DOWNLOAD_URL = API.BASE_API_URL+"downloadFile/";
+    private final String BASE_DOWNLOAD_URL = Constant.BASE_API_URL+"downloadFile/";
     private final IconGenerator iconGenerator;
     private final IconGenerator clusterIconGenerator;
     private final ImageView clusterItemImageView;
@@ -56,9 +60,19 @@ public class ClusterRenderer extends DefaultClusterRenderer<Marker> {
 
     @Override
     protected void onClusterItemRendered(final Marker clusterItem, final com.google.android.gms.maps.model.Marker marker) {
+        String url = BASE_DOWNLOAD_URL+clusterItem.getIcon();
+        SharedPreferences sp = context.getSharedPreferences("AUTHENTICATION", Context.MODE_PRIVATE);
+        String token = sp.getString("token",null);
+
+        GlideUrl glideUrl = new GlideUrl(url, new LazyHeaders.Builder()
+                .addHeader("Authorization", "Bearer "+token)
+                .build());
+
+
+
         Glide.with(context)
                 .asBitmap()
-                .load(BASE_DOWNLOAD_URL+clusterItem.getIcon())
+                .load(glideUrl)
                 .override(200, 200)
                 .centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
