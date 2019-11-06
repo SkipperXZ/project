@@ -109,6 +109,7 @@ def runTest(td):
   numLoops = len(td)
   waitingForReply = False
 
+  #S_start = time.time()
   n = 0
   while n < numLoops:
 
@@ -128,16 +129,25 @@ def runTest(td):
       print (dataRecvd)
       n += 1
       
-      while dataRecvd == bytearray("Retransmission....",'utf-8') :
+      while dataRecvd != bytearray("ReceiveACK",'utf-8') :
         dataRecvd = b""
         dataRecvd = recvFromArduino()
-      #print(dataRecvd)
+        print(dataRecvd)
       waitingForReply = False
       #print(waitingForReply)
 
       print ("===========")
+    
+  #S_end = time.time()
+  #print(S_end - S_start)
+  #time.sleep(1)
 
     #time.sleep(5)
+
+#======================================
+
+def split_len(seq, length):
+    return [seq[i:i+length] for i in range(0, len(seq), length)]
 
 #======================================
 
@@ -145,14 +155,14 @@ def encodeImage():
   
   global tempList
 
-  image = open('3kb.jpg', 'rb')
+  image = open('20kb.jpg', 'rb')
   image_read = image.read()
   image_64_encode = base64.encodebytes(image_read)
 
   #image_64_decode = base64.decodebytes(image_64_encode)
 
-  tempList = image_64_encode.split(b'\n')
-
+  temp_img = image_64_encode.replace(b'\n',b'')
+  tempList = split_len(temp_img,32)
   #print(image_64_decode)
 
 #======================================
@@ -162,31 +172,18 @@ def encodeImage():
 def sendMassage():
 
   testData = []
-  endMassage = b'<' + bytearray("EOF",'utf-8') + b'>'
-  startMassage = b'<' + bytearray("START",'utf-8') + b'>'
+  endMassage = b'<' + bytearray("###############EOF##############",'utf-8') + b'>'
+  startMassage = b'<' + bytearray("##############START#############",'utf-8') + b'>'
   start = 0
+
+  Tstart = time.time()
 
   testData = []
   testData.append(startMassage)
   runTest(testData)
 
-  if (len(tempList)-1)%3 == 2:
-    #massage = '<' + tempList[0].decode("utf-8") + r'\n' + tempList[1].decode("utf-8") + r'\n' + '>'
-    testData = [] 
-    massage = b'<' + tempList[0] + tempList[1] + b'>'
-    testData.append(massage)
-    runTest(testData)
-    start = 2
-  elif (len(tempList)-1)%3 == 1:
-    #massage = '<' + tempList[0].decode("utf-8") + r'\n' + '>'
-    testData = []
-    massage = b'<' + tempList[0] + b'>'
-    testData.append(massage)
-    runTest(testData)
-    start = 1
-
-  for i in range(start,len(tempList)-1,3):
-    massage = b'<' + tempList[i] + tempList[i+1] + tempList[i+2] + b'>'
+  for i in range(start,len(tempList)):
+    massage = b'<' + tempList[i] + b'>'
     testData = []
     testData.append(massage)  
     runTest(testData)
@@ -195,33 +192,40 @@ def sendMassage():
   testData.append(endMassage)
   runTest(testData)
 
+  Tend = time.time()
+  print(Tend - Tstart)
+  time.sleep(2)
+
 #======================================
 
 # THE DEMO PROGRAM STARTS HERE
 
-#======================================
+#======================================+
 
 import serial
 import time
 import base64
+import time
 
 print
 print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM6"
-baudRate = 250000
+serPort = "COM4"
+baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
-
 
 startMarker = 60
 endMarker = 62
 waitForArduino()
 encodeImage()
+
 while(1):
   sendMassage()
+  #time.sleep(1)
+#sendMassage()
 
 ser.close
 

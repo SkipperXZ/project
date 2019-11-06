@@ -103,20 +103,21 @@ def waitForArduino():
 
             #print (msg)
         
-        if msg == bytearray("START",'utf-8'):
+        if msg == bytearray("##############START#############",'utf-8'):
+            img = b""
             startReceive = True
-        if msg == bytearray("Retransmission.....................................",'utf-8') or msg == bytearray("checkMsgID.....",'utf-8') or msg == bytearray("Receiving.....",'utf-8') or msg == bytearray("Send_ACK",'utf-8'):
-            print (msg)
-        elif msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
+        elif msg != bytearray("###############EOF##############",'utf-8') and startReceive and msg != bytearray("##############START#############",'utf-8'):
             img = img + msg
             print (msg)
-        elif msg == bytearray("EOF",'utf-8') and startReceive:      
+        elif msg == bytearray("###############EOF##############",'utf-8') and startReceive:
+            print(img.decode("utf-8"))      
             decodeImage(img)
             startReceive = False
             print("FINISH !!!!")
             img = b""
         else:
-            print("waiting for start message")
+            #print("waiting for start message")
+            print(msg)
 
 #======================================
 
@@ -147,37 +148,36 @@ def runTest():
         #time.sleep(5)
 #======================================
 countImg = 0
+countError = 0
 def decodeImage(img):
-    global countImg
+    global countImg,countError
     #image_64_decode = base64.b64decode(img + bytearray('=','utf-8') * (-len(img) % 4))
-    image_64_decode = base64.b64decode(img)
-
-    image_result = open('logo'+ str(countImg) +'.jpg', 'wb')
-    image_result.write(image_64_decode)
-
-    countImg += 1
+    try:
+      image_64_decode = base64.b64decode(img)
+      image_result = open('logo'+ str(countImg) +'.jpg', 'wb')
+      image_result.write(image_64_decode)
+      countImg += 1
+    except:
+      image_error = open('Error'+ str(countError) +'.jpg', 'wb')
+      image_error.write(image_read)
+      countError += 1
 #======================================
 
-def encodeImage():
+def readImage():
   
-  global tempList
+  global image_read
 
-  image = open('shot.jpg', 'rb')
+  image = open('000_error.png', 'rb')
   image_read = image.read()
-  image_64_encode = base64.encodebytes(image_read)
-
-  tempList = image_64_encode.split(b'\n')
-
-  #print(image_64_encode)
 
 #======================================
 
 def sendMassage():
 
-  testData = []
+  '''testData = []
   start = 0
 
-  '''if (len(tempList)-1)%3 == 2:
+  if (len(tempList)-1)%3 == 2:
     massage = '<' + tempList[0].decode("utf-8") + r'\n' + tempList[1].decode("utf-8") + r'\n' + '>' 
     testData.append(massage)
     runTest(testData)
@@ -186,13 +186,13 @@ def sendMassage():
     massage = '<' + tempList[0].decode("utf-8") + r'\n' + '>'
     testData.append(massage)
     runTest(testData)
-    start = 1'''
+    start = 1
 
   for i in range(start,len(tempList)-1,3):
     #massage = '<' + tempList[i].decode("utf-8") + r'\n' + tempList[i+1].decode("utf-8") + r'\n' + tempList[i+2].decode("utf-8") + r'\n' + '>'
     massage = b'<' + tempList[i] + bytearray(r"\n",'utf-8') + tempList[i+1] + bytearray(r"\n",'utf-8') + tempList[i+2] + bytearray(r"\n",'utf-8') + b'>'
     testData = []
-    testData.append(massage)
+    testData.append(massage)'''
 
 
 #======================================
@@ -210,8 +210,8 @@ print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM10"
-baudRate = 250000
+serPort = "COM12"
+baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
 
@@ -219,6 +219,8 @@ startMarker = 60
 endMarker = 62
 
 print("Ready!!")
+
+readImage()
 while(1):
   waitForArduino()
 #runTest()
