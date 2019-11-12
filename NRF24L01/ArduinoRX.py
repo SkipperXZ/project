@@ -104,6 +104,7 @@ def waitForArduino():
             #print (msg)
         
         if msg == bytearray("#############START############",'utf-8'):
+            Rstart = time.time()
             print("START")
             img = b""
             startReceive = True
@@ -111,10 +112,15 @@ def waitForArduino():
             img = img + msg
             print (msg)
         elif msg == bytearray("#############EOF##############",'utf-8') and startReceive:
-            #print(img.decode("utf-8"))      
+            try:
+              print(img.decode("utf-8"))
+            except:
+              print("Error")      
             decodeImage(img)
             startReceive = False
             print("FINISH !!!!")
+            Rend = time.time()
+            print(Rend - Rstart)
             img = b""
         else:
             #print("waiting for start message")
@@ -154,7 +160,8 @@ def decodeImage(img):
     global countImg,countError
     #image_64_decode = base64.b64decode(img + bytearray('=','utf-8') * (-len(img) % 4))
     try:
-      image_64_decode = base64.b64decode(img)
+      #image_64_decode = base64.b64decode(img)
+      image_64_decode = base64.b64decode(img + bytearray('=','utf-8') * (-len(img) % 4))
       image_result = open('logo'+ str(countImg) +'.jpg', 'wb')
       image_result.write(image_64_decode)
       countImg += 1
