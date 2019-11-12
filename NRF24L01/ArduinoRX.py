@@ -103,14 +103,15 @@ def waitForArduino():
 
             #print (msg)
         
-        if msg == bytearray("##############START#############",'utf-8'):
+        if msg == bytearray("#############START############",'utf-8'):
+            print("START")
             img = b""
             startReceive = True
-        elif msg != bytearray("###############EOF##############",'utf-8') and startReceive and msg != bytearray("##############START#############",'utf-8'):
+        elif msg != bytearray("#############EOF##############",'utf-8') and startReceive and msg != bytearray("#############START############",'utf-8'):
             img = img + msg
             print (msg)
-        elif msg == bytearray("###############EOF##############",'utf-8') and startReceive:
-            print(img.decode("utf-8"))      
+        elif msg == bytearray("#############EOF##############",'utf-8') and startReceive:
+            #print(img.decode("utf-8"))      
             decodeImage(img)
             startReceive = False
             print("FINISH !!!!")
