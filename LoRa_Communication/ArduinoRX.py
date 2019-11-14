@@ -104,6 +104,7 @@ def waitForArduino():
             #print (msg)
         
         if msg == bytearray("START",'utf-8'):
+            Rstart = time.time()
             img = b""
             startReceive = True
         elif msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
@@ -112,8 +113,10 @@ def waitForArduino():
         elif msg == bytearray("EOF",'utf-8') and startReceive:
             print(img.decode("utf-8"))      
             decodeImage(img)
+            Rend = time.time()
             startReceive = False
             print("FINISH !!!!")
+            print(Rend - Rstart)
             img = b""
         else:
             #print("waiting for start message")
