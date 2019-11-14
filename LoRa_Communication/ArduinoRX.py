@@ -111,7 +111,7 @@ def waitForArduino():
             img = img + msg
             print (msg)
         elif msg == bytearray("EOF",'utf-8') and startReceive:
-            print(img.decode("utf-8"))      
+            #print(img.decode("utf-8"))      
             decodeImage(img)
             Rend = time.time()
             startReceive = False

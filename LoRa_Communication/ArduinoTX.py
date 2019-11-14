@@ -162,7 +162,7 @@ def encodeImage():
   #image_64_decode = base64.decodebytes(image_64_encode)
 
   temp_img = image_64_encode.replace(b'\n',b'')
-  tempList = split_len(temp_img,250)
+  tempList = split_len(temp_img,251)
   #print(image_64_decode)
 
 #======================================
