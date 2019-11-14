@@ -129,7 +129,7 @@ def runTest(td):
       print (dataRecvd)
       n += 1
       
-      while dataRecvd != bytearray("ReceiveACK",'utf-8') :
+      while dataRecvd != bytearray("ACK_",'utf-8') :
         dataRecvd = b""
         dataRecvd = recvFromArduino()
         print(dataRecvd)
@@ -155,14 +155,14 @@ def encodeImage():
   
   global tempList
 
-  image = open('20kb.jpg', 'rb')
+  image = open('10kb.jpg', 'rb')
   image_read = image.read()
   image_64_encode = base64.encodebytes(image_read)
 
   #image_64_decode = base64.decodebytes(image_64_encode)
 
   temp_img = image_64_encode.replace(b'\n',b'')
-  tempList = split_len(temp_img,32)
+  tempList = split_len(temp_img,250)
   #print(image_64_decode)
 
 #======================================
@@ -172,11 +172,11 @@ def encodeImage():
 def sendMassage():
 
   testData = []
-  endMassage = b'<' + bytearray("###############EOF##############",'utf-8') + b'>'
-  startMassage = b'<' + bytearray("##############START#############",'utf-8') + b'>'
+  endMassage = b'<' + bytearray("EOF",'utf-8') + b'>'
+  startMassage = b'<' + bytearray("START",'utf-8') + b'>'
   start = 0
 
-  Tstart = time.time()
+  Tstart = time.time() 
 
   testData = []
   testData.append(startMassage)
@@ -194,7 +194,7 @@ def sendMassage():
 
   Tend = time.time()
   print(Tend - Tstart)
-  time.sleep(2)
+  time.sleep(1)
 
 #======================================
 
@@ -212,7 +212,7 @@ print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM4"
+serPort = "COM6"
 baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))

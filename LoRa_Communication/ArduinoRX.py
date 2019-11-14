@@ -103,13 +103,13 @@ def waitForArduino():
 
             #print (msg)
         
-        if msg == bytearray("##############START#############",'utf-8'):
+        if msg == bytearray("START",'utf-8'):
             img = b""
             startReceive = True
-        elif msg != bytearray("###############EOF##############",'utf-8') and startReceive and msg != bytearray("##############START#############",'utf-8'):
+        elif msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
             img = img + msg
             print (msg)
-        elif msg == bytearray("###############EOF##############",'utf-8') and startReceive:
+        elif msg == bytearray("EOF",'utf-8') and startReceive:
             print(img.decode("utf-8"))      
             decodeImage(img)
             startReceive = False
@@ -210,7 +210,7 @@ print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM12"
+serPort = "COM10"
 baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))
