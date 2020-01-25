@@ -20,7 +20,8 @@ const int irqPin = 7;         // change for your board; must be a hardware inter
 
 boolean waitForData = true;
 
-
+byte Inmsgid = 0;
+byte Waitid = 0;
 const byte numChars = 255;
 char receivedChars[numChars];   // an array to store the received data
 char previousReceivedChars[numChars] = "";
@@ -101,7 +102,10 @@ void onReceive(int packetSize) {
   if (packetSize == 0) return;          // if there's no packet, return
 
   //Serial.println("<Receiving.....>");
- 
+
+  Inmsgid = LoRa.read();
+  if (Inmsgid != Waitid) {return;}
+  
   while (LoRa.available() > 0 && newData == false) {
         rc = (char)LoRa.read();
 
@@ -132,7 +136,8 @@ void showNewData() {
         Serial.print("<");
         Serial.print(receivedChars);
         Serial.println(">");
-        
+
+        Waitid++;
         newData = false;
         waitForData = false;
     }

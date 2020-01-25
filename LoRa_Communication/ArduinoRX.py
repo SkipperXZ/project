@@ -213,7 +213,7 @@ print
 
 # NOTE the user must ensure that the serial port and baudrate are correct
 #serPort = "/dev/ttyS80"
-serPort = "COM10"
+serPort = "COM3"
 baudRate = 115200
 ser = serial.Serial(serPort, baudRate)
 print ("Serial port " + serPort + " opened  Baudrate " + str(baudRate))

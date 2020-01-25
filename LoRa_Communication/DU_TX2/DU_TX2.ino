@@ -27,7 +27,7 @@ boolean readInProgress = false;
 boolean newDataFromPC = false;
 boolean waitForReply = false;
 
-
+byte Msgid = 0;
 const byte numChars = 10;
 char receivedChars[numChars];
 
@@ -78,7 +78,7 @@ void loop() {
  
   if(millis() - previousMillis >= interval) { 
     previousMillis = millis();
-    //reSend();
+    reSend();
   }   
 }
 
@@ -178,10 +178,12 @@ void sendToRecive() {
     
     LoRa_txMode();
     LoRa.beginPacket();
+    LoRa.write(Msgid);
     LoRa.print(message);
     LoRa.endPacket();
     LoRa_rxMode();
-     
+
+    Msgid++; 
     previousMillis = millis();
   }
 }
@@ -192,6 +194,7 @@ void reSend() {
 
     LoRa_txMode();
     LoRa.beginPacket();
+    LoRa.write(Msgid-1);
     LoRa.print(message);
     LoRa.endPacket();
     LoRa_rxMode();
