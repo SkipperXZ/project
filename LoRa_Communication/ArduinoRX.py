@@ -107,7 +107,7 @@ def waitForArduino():
             Rstart = time.time()
             img = b""
             startReceive = True
-        elif msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8'):
+        elif msg != bytearray("EOF",'utf-8') and startReceive and msg != bytearray("START",'utf-8') and msg != bytearray("Send_ACK",'utf-8') and msg != bytearray("Waitid_more",'utf-8') and msg != bytearray("Waitid_less",'utf-8') and msg != bytearray("Nocase",'utf-8'):
             img = img + msg
             print (msg)
         elif msg == bytearray("EOF",'utf-8') and startReceive:
